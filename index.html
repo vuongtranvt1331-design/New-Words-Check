@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Wild West Vocabulary Poker</title>
+  <!-- Google Fonts for Western Serif & Vietnamese Diacritic Support -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,500;0,600;0,700;1,500&family=Playfair+Display:wght@700;800;900&family=Rye&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --ivory: #F6EBD8;
+      --parchment: #E8D5B5;
+      --parchment-dark: #D5BC94;
+      --dark-brown: #1E110A;
+      --near-black: #110905;
+      --wood-mid: #2E1A10;
+      --antique-gold: #D4AF37;
+      --gold-bright: #F3D060;
+      --gold-dim: #9A7B2C;
+      --rust-red: #9E2A2B;
+      --rust-bright: #C83E3B;
+      --felt-green: #123C28;
+      --felt-dark: #0A2417;
+      --felt-light: #195237;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: var(--near-black);
+      background-image:
+        radial-gradient(circle at 50% 30%, rgba(74, 40, 20, 0.45) 0%, rgba(15, 8, 4, 0.98) 80%),
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 2px, transparent 2px, transparent 18px);
+      font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+      color: var(--ivory);
+    }
+
+    .font-western {
+      font-family: 'Rye', 'Playfair Display', Georgia, serif;
+    }
+
+    .font-card-word {
+      font-family: 'Playfair Display', Georgia, serif;
+    }
+
+    /* Main Saloon Frame */
+    .game-frame {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      height: 100dvh;
+      max-height: 920px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: linear-gradient(180deg, #27150C 0%, #1B0E07 40%, #150B05 100%);
+      border: 3px solid var(--rust-red);
+      box-shadow:
+        0 0 0 1px var(--antique-gold),
+        inset 0 0 0 2px rgba(212, 175, 55, 0.35),
+        0 20px 50px rgba(0, 0, 0, 0.9);
+      border-radius: 18px;
+      overflow: hidden;
+      padding: env(safe-area-inset-top, 4px) 6px env(safe-area-inset-bottom, 4px) 6px;
+    }
+
+    @media (max-width: 480px) {
+      .game-frame {
+        max-width: 100%;
+        max-height: 100dvh;
+        border-radius: 14px;
+      }
+    }
+
+    /* Green Felt Poker Table */
+    .poker-table {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background:
+        radial-gradient(ellipse at 50% 48%, var(--felt-light) 0%, var(--felt-green) 58%, var(--felt-dark) 100%);
+      border: 2px solid var(--antique-gold);
+      border-radius: 14px;
+      box-shadow:
+        inset 0 0 24px rgba(0, 0, 0, 0.75),
+        inset 0 0 0 2px rgba(158, 42, 43, 0.45),
+        0 4px 12px rgba(0, 0, 0, 0.5);
+      padding: 6px 8px;
+      margin: 3px 2px;
+      overflow: hidden;
+    }
+
+    .poker-table::before {
+      content: "";
+      position: absolute;
+      inset: 4px;
+      border: 1px dashed rgba(212, 175, 55, 0.28);
+      border-radius: 10px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .cards-grid {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+      flex: 1 1 0;
+      min-height: 0;
+      width: 100%;
+    }
+
+    .card-slot {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 68px;
+      perspective: 900px;
+    }
+
+    .playing-card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      transform-style: preserve-3d;
+      transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, filter 0.25s ease;
+      cursor: pointer;
+      will-change: transform;
+    }
+
+    .playing-card.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .playing-card.opponent-card {
+      cursor: default;
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card-front {
+      background:
+        radial-gradient(circle at 50% 50%, #FFF9EE 0%, var(--ivory) 65%, var(--parchment) 100%);
+      border: 2px solid #2A160B;
+      box-shadow:
+        inset 0 0 0 2px var(--antique-gold),
+        inset 0 0 0 4px #FDF6E7,
+        inset 0 0 0 5px rgba(154, 123, 44, 0.65),
+        0 4px 10px rgba(0, 0, 0, 0.55);
+      padding: 16px 10px;
+      color: var(--dark-brown);
+    }
+
+    .card-front::before {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border: 1px solid rgba(158, 42, 43, 0.22);
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      background:
+        radial-gradient(circle at 50% 50%, #6E1D1D 0%, #3E120C 62%, #220A06 100%);
+      border: 2px solid #2A160B;
+      box-shadow:
+        inset 0 0 0 2px var(--antique-gold),
+        inset 0 0 0 4px #2B0D08,
+        inset 0 0 0 5.5px rgba(212, 175, 55, 0.75),
+        0 4px 10px rgba(0, 0, 0, 0.6);
+    }
+
+    .card-back::before {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border: 1px solid rgba(246, 235, 216, 0.35);
+      border-radius: 6px;
+      background-image:
+        radial-gradient(rgba(212, 175, 55, 0.16) 1px, transparent 1px);
+      background-size: 8px 8px;
+      pointer-events: none;
+    }
+
+    .card-corner {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 0.92;
+      font-weight: 800;
+      font-size: clamp(0.62rem, 1.9vw, 0.76rem);
+      letter-spacing: -0.02em;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .card-corner.top-left { top: 7px; left: 8px; }
+    .card-corner.bottom-right { bottom: 7px; right: 8px; transform: rotate(180deg); }
+
+    .suit-red { color: var(--rust-red); }
+    .suit-black { color: #23120B; }
+
+    .corner-ornament {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border: 1px solid rgba(154, 123, 44, 0.65);
+      transform: rotate(45deg);
+      pointer-events: none;
+    }
+    .corner-ornament.tr { top: 9px; right: 9px; }
+    .corner-ornament.bl { bottom: 9px; left: 9px; }
+
+    .playing-card.active-target { transform: translateY(-2px) scale(1.02); }
+    .playing-card.active-target .card-front {
+      border-color: var(--gold-bright);
+      box-shadow:
+        0 0 0 2px var(--gold-bright),
+        0 0 16px rgba(243, 208, 96, 0.85),
+        inset 0 0 0 2px var(--antique-gold),
+        inset 0 0 12px rgba(212, 175, 55, 0.35);
+      animation: pulseTargetGold 1.5s infinite ease-in-out;
+    }
+
+    @keyframes pulseTargetGold {
+      0%, 100% { box-shadow: 0 0 0 2px var(--gold-bright), 0 0 12px rgba(243, 208, 96, 0.7), inset 0 0 0 2px var(--antique-gold); }
+      50% { box-shadow: 0 0 0 3px #FFF2A6, 0 0 22px rgba(243, 208, 96, 1), inset 0 0 0 2px var(--antique-gold); }
+    }
+
+    .playing-card.correct-flash .card-front {
+      border-color: var(--gold-bright) !important;
+      background: radial-gradient(circle, #FFF8CC 0%, #F5DF8B 100%) !important;
+      box-shadow: 0 0 24px rgba(243, 208, 96, 1), inset 0 0 0 3px var(--antique-gold) !important;
+    }
+
+    .playing-card.wrong-flash {
+      animation: cardWrongRecoil 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+      z-index: 20;
+    }
+    .playing-card.wrong-flash .card-front {
+      border-color: var(--rust-bright) !important;
+      background: radial-gradient(circle, #FFD6D6 0%, #F2A7A7 100%) !important;
+      box-shadow: 0 0 24px rgba(200, 62, 59, 0.95), inset 0 0 0 3px var(--rust-red) !important;
+    }
+
+    @keyframes cardWrongRecoil {
+      0% { transform: scale(1); }
+      15% { transform: translate(-7px, -4px) rotate(-4deg) scale(1.04); }
+      30% { transform: translate(7px, 3px) rotate(4deg) scale(1.02); }
+      45% { transform: translate(-5px, 2px) rotate(-2.5deg); }
+      60% { transform: translate(4px, -2px) rotate(2deg); }
+      80% { transform: translate(-2px, 1px) rotate(-1deg); }
+      100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+    }
+
+    .playing-card.student-selectable:active { transform: scale(0.96); }
+
+    .playing-card.dealing-start {
+      opacity: 0;
+      transform: translateY(-90px) scale(0.45) rotate(-14deg);
+      pointer-events: none;
+    }
+    .playing-card.dealing-animate {
+      animation: dealCardIn 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.05) forwards;
+    }
+    @keyframes dealCardIn {
+      0% { opacity: 0; transform: translateY(-90px) scale(0.45) rotate(-14deg); }
+      75% { opacity: 1; transform: translateY(3px) scale(1.02) rotate(1.5deg); }
+      100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+    }
+
+    .screen-shake {
+      animation: westernShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+    @keyframes westernShake {
+      0%, 100% { transform: translate(0, 0); }
+      15% { transform: translate(-6px, 4px) rotate(-0.6deg); }
+      30% { transform: translate(6px, -5px) rotate(0.6deg); }
+      45% { transform: translate(-5px, -3px) rotate(-0.4deg); }
+      60% { transform: translate(4px, 4px) rotate(0.3deg); }
+      75% { transform: translate(-3px, 2px); }
+    }
+
+    .chip-token { transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease; }
+    .chip-token.chip-gain-anim { animation: chipPopIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+    .chip-token.chip-loss-anim { animation: chipFlyOut 0.55s ease-in forwards; }
+    @keyframes chipPopIn {
+      0% { transform: translateY(-22px) scale(0.2); opacity: 0; }
+      70% { transform: translateY(2px) scale(1.22); opacity: 1; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    @keyframes chipFlyOut {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(24px) scale(0.2) rotate(25deg); opacity: 0.15; }
+    }
+
+    .card-word-text { font-weight: 800; color: #1B0D06; text-align: center; line-height: 1.08; word-break: break-word; hyphens: auto; max-width: 92%; z-index: 2; }
+    .card-vi-text { font-weight: 600; color: #5C341E; text-align: center; line-height: 1.15; margin-top: 3px; max-width: 94%; z-index: 2; }
+    .card-synonym-text { font-family: 'Playfair Display', Georgia, serif; font-weight: 800; color: #1B0D06; text-align: center; line-height: 1.12; word-break: break-word; hyphens: auto; max-width: 92%; z-index: 2; }
+
+    .western-btn {
+      background: linear-gradient(180deg, #4A2816 0%, #2B160B 100%);
+      border: 1.5px solid var(--antique-gold);
+      color: var(--ivory);
+      box-shadow: 0 2px 0 #140904, inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      transition: transform 0.12s ease, filter 0.15s ease;
+    }
+    .western-btn:hover { filter: brightness(1.12); }
+    .western-btn:active { transform: translateY(1px); }
+  </style>
+</head>
+<body class="flex items-center justify-center">
+
+  <main id="gameFrame" class="game-frame select-none">
+
+    <!-- TOP COMPACT HEADER -->
+    <header class="flex items-center justify-between px-2 py-1.5 bg-[#1B0E08] border border-[#D4AF37]/50 rounded-xl shadow-md shrink-0">
+      <div class="flex items-center gap-1.5 min-w-0">
+        <div class="px-2 py-0.5 rounded-lg bg-[#9E2A2B] border border-[#D4AF37] shadow-inner">
+          <span id="roundCounterText" class="font-western text-[11px] sm:text-xs tracking-wider text-[#F6EBD8] whitespace-nowrap">ROUND 1</span>
+        </div>
+        <div class="px-2 py-0.5 rounded-lg bg-[#2C180E] border border-[#D4AF37]/40 text-[10px] sm:text-[11px] font-semibold text-[#E8D5B5] whitespace-nowrap" title="Unseen vocabulary remaining in current deck cycle">
+          <span id="deckProgressText">DECK 4/20</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button id="vocabBtn" type="button" class="western-btn px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1" aria-label="Vocabulary Library">
+          <svg class="w-3.5 h-3.5 text-[#D4AF37]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          <span>Vocab</span>
+        </button>
+
+        <button id="restartBtn" type="button" class="western-btn px-2 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1" aria-label="Restart Game">
+          <svg class="w-3.5 h-3.5 text-[#D4AF37]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+          <span class="hidden xs:inline">Restart</span>
+        </button>
+
+        <button id="soundToggleBtn" type="button" class="western-btn px-2 py-1 rounded-lg text-[11px] font-bold flex items-center justify-center" aria-label="Toggle Sound" title="Toggle Sound">
+          <svg id="soundOnIcon" class="w-4 h-4 text-[#D4AF37]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>
+          <svg id="soundOffIcon" class="w-4 h-4 text-[#C83E3B] hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- COWBOY OPPONENT & SPEECH BUBBLE AREA -->
+    <section class="relative flex items-center justify-center gap-2 px-2 py-1 shrink-0 pointer-events-none" aria-label="Cowboy Opponent">
+      <div class="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center">
+        <svg viewBox="0 0 140 130" class="w-full h-full drop-shadow-[0_4px_6px_rgba(0,0,0,0.85)]">
+          <circle cx="70" cy="68" r="52" fill="#3B1F10" stroke="#D4AF37" stroke-width="2" stroke-dasharray="4 2" opacity="0.85"/>
+          <path d="M22 124 C25 93, 45 86, 70 86 C95 86, 115 93, 118 124 Z" fill="#3D2012" stroke="#1A0C06" stroke-width="2.5"/>
+          <path d="M46 90 L62 124 L78 124 L94 90" fill="#231108" stroke="#D4AF37" stroke-width="1.2"/>
+          <polygon points="92,102 94,106 98,106 95,109 96,113 92,110 88,113 89,109 86,106 90,106" fill="#D4AF37"/>
+          <path d="M48 83 Q70 96 92 83 L83 106 Q70 112 57 106 Z" fill="#9E2A2B" stroke="#1E110A" stroke-width="2"/>
+          <path d="M62 92 Q70 97 78 92" stroke="#D4AF37" stroke-width="1.2" fill="none"/>
+          <path d="M50 48 L50 72 Q50 88 70 88 Q90 88 90 72 L90 48 Z" fill="#D9A173" stroke="#231108" stroke-width="2"/>
+          <path d="M51 66 Q51 87 70 87 Q89 87 89 66 L89 72 Q89 88 70 88 Q51 88 51 72 Z" fill="#8C5B3C" opacity="0.45"/>
+          <path d="M55 57 L65 59" stroke="#1E110A" stroke-width="2.8" stroke-linecap="round"/>
+          <path d="M85 57 L75 59" stroke="#1E110A" stroke-width="2.8" stroke-linecap="round"/>
+          <circle cx="60" cy="61" r="2.2" fill="#1E110A"/>
+          <circle cx="80" cy="61" r="2.2" fill="#1E110A"/>
+          <path d="M70 72 C62 70, 54 74, 49 79 C55 80, 63 78, 70 75 C77 78, 85 80, 91 79 C86 74, 78 70, 70 72 Z" fill="#2A160D" stroke="#120904" stroke-width="1.5"/>
+          <path d="M44 42 C46 18, 56 14, 63 18 C67 20, 73 20, 77 18 C84 14, 94 18, 96 42 Z" fill="#4E2B18" stroke="#1A0C06" stroke-width="2.5"/>
+          <path d="M44 38 Q70 44 96 38 L97 43 Q70 49 43 43 Z" fill="#9E2A2B" stroke="#1A0C06" stroke-width="1.5"/>
+          <rect x="66" y="39" width="8" height="6" rx="1" fill="none" stroke="#D4AF37" stroke-width="1.8"/>
+          <path d="M12 42 Q40 53 70 53 Q100 53 128 42 Q105 33 70 36 Q35 33 12 42 Z" fill="#5E341E" stroke="#1A0C06" stroke-width="2.5"/>
+        </svg>
+      </div>
+
+      <div class="relative bg-[#F6EBD8] text-[#1E110A] border-2 border-[#2A160B] rounded-2xl px-3.5 py-2 shadow-[0_4px_10px_rgba(0,0,0,0.6),inset_0_0_0_2px_#D4AF37] max-w-[230px]">
+        <div class="absolute -left-2.5 top-1/2 -translate-y-1/2 w-0 h-0 border-t-[7px] border-t-transparent border-r-[10px] border-r-[#2A160B] border-b-[7px] border-b-transparent"></div>
+        <div class="absolute -left-[7px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[5px] border-t-transparent border-r-[8px] border-r-[#F6EBD8] border-b-[5px] border-b-transparent"></div>
+
+        <p id="cowboySpeech" class="font-card-word font-extrabold text-xs sm:text-sm tracking-tight leading-snug text-[#1E110A]">
+          “Make your move.”
+        </p>
+        <div id="turnStatusSubtext" class="text-[10px] font-bold text-[#9E2A2B] uppercase tracking-wider mt-0.5">
+          Match the highlighted card
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN GREEN FELT POKER TABLE -->
+    <section id="pokerTable" class="poker-table">
+      <div class="flex flex-col flex-1 min-h-0">
+        <div class="flex items-center justify-between px-1 mb-0.5 shrink-0">
+          <span class="text-[10px] font-bold uppercase tracking-widest text-[#E8D5B5]/85 flex items-center gap-1">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></span>
+            Outlaw's Hand (Original Word)
+          </span>
+          <span id="turnCounterBadge" class="text-[10px] font-bold text-[#F3D060] tracking-wider">
+            CARD 1 OF 4
+          </span>
+        </div>
+        <div id="opponentGrid" class="cards-grid" aria-label="Opponent's four vocabulary cards"></div>
+      </div>
+
+      <div class="relative flex items-center justify-center my-1.5 shrink-0 z-10">
+        <div class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-[#D4AF37]/70 to-[#D4AF37]"></div>
+        <div id="tableCenterBadge" class="mx-2 px-3 py-0.5 rounded-full bg-[#1B0E07]/95 border border-[#D4AF37] shadow-md flex items-center gap-1.5">
+          <span class="text-[#D4AF37] text-[10px]">✦</span>
+          <span id="tableStatusText" class="font-western text-[10px] sm:text-[11px] tracking-wider text-[#F6EBD8] uppercase">
+            SELECT MATCHING SYNONYM
+          </span>
+          <span class="text-[#D4AF37] text-[10px]">✦</span>
+        </div>
+        <div class="h-[1px] flex-1 bg-gradient-to-l from-transparent via-[#D4AF37]/70 to-[#D4AF37]"></div>
+      </div>
+
+      <div class="flex flex-col flex-1 min-h-0">
+        <div class="flex items-center justify-between px-1 mb-0.5 shrink-0">
+          <span class="text-[10px] font-bold uppercase tracking-widest text-[#E8D5B5]/85 flex items-center gap-1">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#C83E3B]"></span>
+            Your Hand (Tap Synonym)
+          </span>
+          <span id="roundMatchTracker" class="text-[10px] font-bold text-[#E8D5B5]/90">
+            0 / 4 MATCHED
+          </span>
+        </div>
+        <div id="studentGrid" class="cards-grid" aria-label="Your four synonym cards"></div>
+      </div>
+
+      <div id="roundResultToast" class="pointer-events-none absolute inset-x-3 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center opacity-0 scale-90 transition-all duration-300">
+        <div id="roundResultBox" class="px-4 py-2.5 rounded-xl border-2 border-[#D4AF37] bg-[#1E110A]/95 shadow-[0_10px_30px_rgba(0,0,0,0.9)] text-center">
+          <p id="roundResultTitle" class="font-western text-sm sm:text-base tracking-wider text-[#F3D060]">ROUND BONUS: +1 CHIP</p>
+          <p id="roundResultSub" class="text-[11px] font-semibold text-[#F6EBD8] mt-0.5">All 4 synonyms matched!</p>
+        </div>
+      </div>
+
+      <div id="wrongShotOverlay" class="pointer-events-none absolute inset-0 z-25 hidden items-center justify-center"></div>
+    </section>
+
+    <!-- BOTTOM POKER-CHIP COUNTER FOOTER -->
+    <footer class="px-2.5 py-1.5 bg-[#190D07] border border-[#D4AF37]/60 rounded-xl shadow-inner shrink-0 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <div class="relative w-9 h-9 shrink-0 flex items-center justify-center">
+          <svg viewBox="0 0 48 48" class="w-full h-full drop-shadow">
+            <circle cx="24" cy="24" r="21" fill="#9E2A2B" stroke="#D4AF37" stroke-width="2.5"/>
+            <circle cx="24" cy="24" r="17" fill="none" stroke="#F6EBD8" stroke-width="2.5" stroke-dasharray="5 4"/>
+            <circle cx="24" cy="24" r="12" fill="#1E110A" stroke="#D4AF37" stroke-width="1.5"/>
+            <text x="24" y="28" text-anchor="middle" fill="#F3D060" font-family="Rye, serif" font-size="12">★</text>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-baseline gap-1.5">
+            <span class="font-western text-xs sm:text-sm text-[#F3D060] tracking-wide">CHIPS:</span>
+            <span id="chipCountValue" class="font-western text-base sm:text-lg text-[#F6EBD8]">5</span>
+            <span class="text-[11px] font-bold text-[#E8D5B5]/70">/ 10</span>
+          </div>
+          <div class="text-[9px] sm:text-[10px] text-[#E8D5B5]/75 font-medium leading-none">
+            -2 Chips per error · Retry until correct
+          </div>
+        </div>
+      </div>
+
+      <div id="chipStackContainer" class="flex items-center gap-1 px-1.5 py-1 rounded-lg bg-[#110804] border border-[#D4AF37]/30" aria-label="Poker chip stack progress"></div>
+    </footer>
+
+    <!-- TERMINAL SHOWDOWN OVERLAY -->
+    <div id="endingOverlay" class="hidden absolute inset-0 z-50 flex-col items-center justify-between p-5 bg-[#0B0503]/92 backdrop-blur-[2px] overflow-hidden">
+      <div id="endingBulletHoles" class="absolute inset-0 pointer-events-none z-10"></div>
+
+      <div class="relative z-20 mt-4 text-center">
+        <div id="endingBadge" class="inline-block px-3.5 py-1 rounded-full border border-[#D4AF37] bg-[#2B150C] font-western text-xs tracking-widest text-[#F3D060] uppercase shadow-lg">
+          SHOWDOWN OVER
+        </div>
+      </div>
+
+      <div id="endingCardBox" class="relative z-20 w-full max-w-xs bg-gradient-to-b from-[#2A160D] to-[#160B06] border-2 border-[#D4AF37] rounded-2xl p-5 text-center shadow-[0_0_40px_rgba(0,0,0,0.95),inset_0_0_0_2px_#9E2A2B] opacity-0 translate-y-4 transition-all duration-500">
+        <div class="w-16 h-16 mx-auto mb-3 flex items-center justify-center rounded-full bg-[#120804] border border-[#D4AF37]/60 shadow-inner">
+          <svg viewBox="0 0 64 64" class="w-11 h-11">
+            <path d="M10 18 C6 10, 14 4, 20 12 C23 16, 22 22, 22 22 L42 22 C42 22, 41 16, 44 12 C50 4, 58 10, 54 18 C50 25, 44 26, 44 26 L40 42 L35 54 L29 54 L24 42 L20 26 C20 26, 14 25, 10 18 Z" fill="#F6EBD8" stroke="#D4AF37" stroke-width="2"/>
+            <circle cx="26" cy="32" r="3.5" fill="#1E110A"/>
+            <circle cx="38" cy="32" r="3.5" fill="#1E110A"/>
+            <polygon points="32,40 29,47 35,47" fill="#1E110A"/>
+          </svg>
+        </div>
+
+        <h2 id="endingExactMessage" class="font-card-word font-extrabold text-lg sm:text-xl text-[#F6EBD8] leading-snug mb-2 px-1">
+          “Reckon you need a bit more practice, partner.”
+        </h2>
+
+        <p id="endingStatsSummary" class="text-xs text-[#E8D5B5]/80 font-medium mb-5">
+          Final Chips: 0 · Rounds Played: 1
+        </p>
+
+        <button id="playAgainBtn" type="button" class="w-full py-3 px-5 rounded-xl font-western text-sm tracking-wider text-[#1E110A] bg-gradient-to-b from-[#F3D060] to-[#C89D28] border-2 border-[#FFF3B0] shadow-[0_4px_15px_rgba(212,175,55,0.5)] active:scale-95 transition-transform">
+          Play Again
+        </button>
+      </div>
+
+      <div class="relative z-20 mb-2 text-center text-[11px] text-[#E8D5B5]/60 font-medium">
+        Wild West Vocabulary Poker Showdown
+      </div>
+    </div>
+
+    <!-- VOCABULARY LIBRARY MODAL -->
+    <div id="vocabModal" class="hidden absolute inset-0 z-50 bg-[#0D0603]/90 backdrop-blur-sm flex items-center justify-center p-3">
+      <div class="w-full max-w-sm max-h-[90dvh] flex flex-col bg-[#22120A] border-2 border-[#D4AF37] rounded-2xl shadow-2xl overflow-hidden text-[#F6EBD8]">
+        <div class="flex items-center justify-between px-4 py-3 bg-[#160B06] border-b border-[#D4AF37]/40">
+          <div class="flex items-center gap-2">
+            <span class="text-[#D4AF37] font-western text-sm">VOCABULARY LIBRARY</span>
+          </div>
+          <button id="closeVocabModalBtn" type="button" class="w-7 h-7 rounded-lg bg-[#2E1A10] border border-[#D4AF37]/50 flex items-center justify-center text-[#F6EBD8] font-bold">
+            ✕
+          </button>
+        </div>
+
+        <div class="p-4 overflow-y-auto space-y-3 text-xs">
+          <div class="p-2.5 rounded-xl bg-[#160B06] border border-[#D4AF37]/30 flex items-center justify-between">
+            <div>
+              <div class="text-[11px] text-[#E8D5B5]/75">Active Lesson Library</div>
+              <div id="activeLibraryCount" class="font-bold text-sm text-[#F3D060]">Loading...</div>
+            </div>
+            <span id="pendingLibraryBadge" class="hidden px-2 py-0.5 rounded bg-[#9E2A2B] border border-[#D4AF37] text-[10px] font-bold">
+              Pending Next Round
+            </span>
+          </div>
+
+          <p class="text-[#E8D5B5]/90 leading-relaxed">
+            Your game automatically reads from <code class="px-1 py-0.5 rounded bg-[#120904] text-[#F3D060]">words.json</code> on your GitHub repository. Update that file on GitHub to update your vocabulary! You can also fetch the latest <code class="text-[#F3D060]">words.json</code> right now or upload a local file.
+          </p>
+
+          <div class="space-y-2">
+            <button id="reloadGitHubWordsBtn" type="button" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-[#1E110A] bg-gradient-to-b from-[#F3D060] to-[#C89D28] border border-[#FFF3B0] shadow flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.65-5.65"/>
+              </svg>
+              <span>Fetch / Reload words.json</span>
+            </button>
+
+            <input id="vocabFileInput" type="file" accept=".json,application/json" class="hidden" />
+            <div class="flex gap-2">
+              <button id="chooseJsonFileBtn" type="button" class="western-btn flex-1 py-2 px-2.5 rounded-xl font-semibold text-[11px] flex items-center justify-center gap-1">
+                <span>📁 Upload JSON</span>
+              </button>
+              <button id="applyAndRestartNowBtn" type="button" class="hidden western-btn flex-1 py-2 px-2.5 rounded-xl font-semibold text-[11px] bg-[#9E2A2B] text-[#F6EBD8]">
+                <span>Apply & Restart</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="vocabValidationBox" class="hidden p-3 rounded-xl border text-xs leading-relaxed"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      const FALLBACK_VOCAB_JSON = [
+        { word: "substantial", translation: "đáng kể", synonym: "considerable" },
+        { word: "allocate", translation: "phân bổ", synonym: "assign" },
+        { word: "sustainable", translation: "bền vững", synonym: "viable" },
+        { word: "initiative", translation: "sáng kiến", synonym: "proposal" },
+        { word: "inevitable", translation: "không thể tránh khỏi", synonym: "unavoidable" },
+        { word: "meticulous", translation: "tỉ mỉ", synonym: "thorough" },
+        { word: "ambiguous", translation: "mơ hồ", synonym: "vague" },
+        { word: "deteriorate", translation: "xấu đi", synonym: "worsen" },
+        { word: "augment", translation: "làm tăng thêm", synonym: "increase" },
+        { word: "obsolete", translation: "lỗi thời", synonym: "outdated" },
+        { word: "resilient", translation: "kiên cường", synonym: "tough" },
+        { word: "scrutinize", translation: "xem xét kỹ", synonym: "examine" },
+        { word: "lucrative", translation: "sinh lời cao", synonym: "profitable" },
+        { word: "mitigate", translation: "giảm nhẹ", synonym: "alleviate" },
+        { word: "plausible", translation: "hợp lý", synonym: "believable" },
+        { word: "adversity", translation: "nghịch cảnh", synonym: "hardship" },
+        { word: "concur", translation: "đồng tình", synonym: "agree" },
+        { word: "reluctant", translation: "miễn cưỡng", synonym: "hesitant" },
+        { word: "pivotal", translation: "then chốt", synonym: "crucial" },
+        { word: "candid", translation: "thẳng thắn", synonym: "frank" }
+      ];
+
+      const GAME_STATES = {
+        READY: 'READY',
+        DEALING: 'DEALING',
+        PLAYING: 'PLAYING',
+        RESOLVING: 'RESOLVING',
+        ROUND_COMPLETE: 'ROUND_COMPLETE',
+        VICTORY: 'VICTORY',
+        DEFEAT: 'DEFEAT'
+      };
+
+      const CARD_RANKS = ['A', 'K', 'Q', 'J', '10', '9', '8', '7'];
+      const CARD_SUITS = [
+        { symbol: '♠', colorClass: 'suit-black', name: 'spades' },
+        { symbol: '♥', colorClass: 'suit-red', name: 'hearts' },
+        { symbol: '♦', colorClass: 'suit-red', name: 'diamonds' },
+        { symbol: '♣', colorClass: 'suit-black', name: 'clubs' }
+      ];
+
+      const state = {
+        gameState: GAME_STATES.READY,
+        chips: 5,
+        round: 1,
+        vocabLibrary: [],
+        pendingVocabLibrary: null,
+        unusedPoolIds: [],
+        opponentHand: [],
+        studentHand: [],
+        activeOpponentIndex: 0,
+        roundCorrectCount: 0,
+        roundIncorrectAttempts: 0,
+        roundScored: false,
+        soundEnabled: true,
+        sessionToken: 0,
+        activeTimers: new Set()
+      };
+
+      class WesternSoundEngine {
+        constructor() { this.ctx = null; }
+        ensureContext() {
+          if (!state.soundEnabled) return null;
+          if (!this.ctx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) this.ctx = new AudioCtx();
+          }
+          if (this.ctx && this.ctx.state === 'suspended') {
+            this.ctx.resume().catch(() => {});
+          }
+          return this.ctx;
+        }
+        createNoiseBuffer(durationSec) {
+          const ctx = this.ensureContext();
+          if (!ctx) return null;
+          const bufferSize = Math.floor(ctx.sampleRate * durationSec);
+          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+          return buffer;
+        }
+        playCardShuffle() {
+          const ctx = this.ensureContext();
+          if (!ctx) return;
+          for (let i = 0; i < 5; i++) {
+            scheduleTimer(() => {
+              if (!state.soundEnabled) return;
+              this.playCardDeal(0.045, 900 + i * 110);
+            }, i * 55);
+          }
+        }
+        playCardDeal(duration = 0.07, filterFreq = 1200) {
+          const ctx = this.ensureContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          const noiseBuffer = this.createNoiseBuffer(duration);
+          if (!noiseBuffer) return;
+          const source = ctx.createBufferSource();
+          source.buffer = noiseBuffer;
+          const filter = ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(filterFreq, now);
+          const gain = ctx.createGain();
+          gain.gain.setValueAtTime(0.01, now);
+          gain.gain.linearRampToValueAtTime(0.18, now + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+          source.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+          source.start(now);
+        }
+        playCardPlace() {
+          const ctx = this.ensureContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(140, now);
+          osc.frequency.exponentialRampToValueAtTime(55, now + 0.055);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(now); osc.stop(now + 0.065);
+        }
+        playCardSelect() {
+          const ctx = this.ensureContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, now);
+          osc.frequency.exponentialRampToValueAtTime(900, now + 0.05);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(now); osc.stop(now + 0.065);
+        }
+        playCorrectMatch() {
+          const ctx = this.ensureContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          [523.25, 659.25, 783.99].forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + idx * 0.055);
+            gain.gain.setValueAtTime(0.001, now + idx * 0.055);
+            gain.gain.linearRampToValueAtTime(0.16, now + idx * 0.055 + 0.015);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.055 + 0.32);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(now + idx * 0.055); osc.stop(now + idx * 0.055 + 0.34);
+          });
+        }
+        playChipGain() {
+          const ctx = this.ensureContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          [2200, 3300, 4180].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.06);
+            gain.gain.setValueAtTime(0.14, now + i * 0.06);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.22);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(now + i * 0.06); osc.stop(now + i * 0.06 + 0.24);
+          });
+        }
+        playChipLoss() {
+          const ctx = this.ensureContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          [392, 330, 261.6, 196].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(freq, now + i * 0.065);
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(900, now);
+            gain.gain.setValueAtTime(0.12, now + i * 0.065);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.065 + 0.18);
+            osc.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+            osc.start(now + i * 0.065); osc.stop(now + i * 0.065 + 0.2);
+          });
+        }
+        playAngryNoVoice() {
+          const ctx = this.ensureContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const filter = ctx.createBiquadFilter();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(180, now);
+          osc.frequency.exponentialRampToValueAtTime(80, now + 0.35);
+          filter.type = 'formant';
+          filter.frequency.setValueAtTime(500, now);
+          gain.gain.setValueAtTime(0.01, now);
+          gain.gain.linearRampToValueAtTime(0.28, now + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+          osc.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+          osc.start(now); osc.stop(now + 0.4);
+        }
+        playGunshot() {
+          const ctx = this.ensureContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          const noiseBuffer = this.createNoiseBuffer(0.38);
+          if (noiseBuffer) {
+            const noise = ctx.createBufferSource();
+            noise.buffer = noiseBuffer;
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(3200, now);
+            const gain = ctx.createGain();
+            gain.gain.setValueAtTime(0.52, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.36);
+            noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+            noise.start(now);
+          }
+        }
+        playTripleGunshots() {
+          for (let i = 0; i < 3; i++) {
+            scheduleTimer(() => {
+              if (!state.soundEnabled) return;
+              this.playGunshot();
+            }, i * 220);
+          }
+        }
+        playBulletWhizz() {
+          const ctx = this.ensureContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(2900, now);
+          osc.frequency.exponentialRampToValueAtTime(520, now + 0.24);
+          gain.gain.setValueAtTime(0.01, now);
+          gain.gain.linearRampToValueAtTime(0.22, now + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.start(now); osc.stop(now + 0.26);
+        }
+        playCowboyGuitarEnding(isVictory = false) {
+          const ctx = this.ensureContext();
+          if (!ctx) return;
+          const now = ctx.currentTime;
+          const notes = isVictory
+            ? [{ freq: 146.83, delay: 0.0, dur: 0.55 }, { freq: 220.00, delay: 0.16, dur: 0.55 }, { freq: 293.66, delay: 0.32, dur: 0.65 }, { freq: 349.23, delay: 0.52, dur: 0.65 }, { freq: 329.63, delay: 0.78, dur: 0.55 }, { freq: 293.66, delay: 1.02, dur: 1.25 }]
+            : [{ freq: 164.81, delay: 0.0, dur: 0.5 }, { freq: 246.94, delay: 0.18, dur: 0.5 }, { freq: 293.66, delay: 0.36, dur: 0.5 }, { freq: 246.94, delay: 0.58, dur: 0.5 }, { freq: 196.00, delay: 0.80, dur: 0.6 }, { freq: 164.81, delay: 1.05, dur: 1.3 }];
+          notes.forEach((n) => {
+            const start = now + n.delay;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(n.freq, start);
+            gain.gain.setValueAtTime(0.001, start);
+            gain.gain.linearRampToValueAtTime(0.2, start + 0.012);
+            gain.gain.exponentialRampToValueAtTime(0.0008, start + n.dur);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(start); osc.stop(start + n.dur + 0.02);
+          });
+        }
+      }
+
+      const sound = new WesternSoundEngine();
+
+      function scheduleTimer(callback, delayMs) {
+        const capturedToken = state.sessionToken;
+        const timerId = window.setTimeout(() => {
+          state.activeTimers.delete(timerId);
+          if (state.sessionToken !== capturedToken) return;
+          callback();
+        }, delayMs);
+        state.activeTimers.add(timerId);
+        return timerId;
+      }
+
+      function clearAllScheduledTimers() {
+        state.sessionToken += 1;
+        state.activeTimers.forEach((id) => window.clearTimeout(id));
+        state.activeTimers.clear();
+      }
+
+      const dom = {
+        gameFrame: document.getElementById('gameFrame'),
+        roundCounterText: document.getElementById('roundCounterText'),
+        deckProgressText: document.getElementById('deckProgressText'),
+        vocabBtn: document.getElementById('vocabBtn'),
+        restartBtn: document.getElementById('restartBtn'),
+        soundToggleBtn: document.getElementById('soundToggleBtn'),
+        soundOnIcon: document.getElementById('soundOnIcon'),
+        soundOffIcon: document.getElementById('soundOffIcon'),
+        cowboySpeech: document.getElementById('cowboySpeech'),
+        turnStatusSubtext: document.getElementById('turnStatusSubtext'),
+        turnCounterBadge: document.getElementById('turnCounterBadge'),
+        opponentGrid: document.getElementById('opponentGrid'),
+        studentGrid: document.getElementById('studentGrid'),
+        tableStatusText: document.getElementById('tableStatusText'),
+        roundMatchTracker: document.getElementById('roundMatchTracker'),
+        roundResultToast: document.getElementById('roundResultToast'),
+        roundResultTitle: document.getElementById('roundResultTitle'),
+        roundResultSub: document.getElementById('roundResultSub'),
+        wrongShotOverlay: document.getElementById('wrongShotOverlay'),
+        chipCountValue: document.getElementById('chipCountValue'),
+        chipStackContainer: document.getElementById('chipStackContainer'),
+        endingOverlay: document.getElementById('endingOverlay'),
+        endingBulletHoles: document.getElementById('endingBulletHoles'),
+        endingBadge: document.getElementById('endingBadge'),
+        endingCardBox: document.getElementById('endingCardBox'),
+        endingExactMessage: document.getElementById('endingExactMessage'),
+        endingStatsSummary: document.getElementById('endingStatsSummary'),
+        playAgainBtn: document.getElementById('playAgainBtn'),
+        vocabModal: document.getElementById('vocabModal'),
+        closeVocabModalBtn: document.getElementById('closeVocabModalBtn'),
+        activeLibraryCount: document.getElementById('activeLibraryCount'),
+        pendingLibraryBadge: document.getElementById('pendingLibraryBadge'),
+        reloadGitHubWordsBtn: document.getElementById('reloadGitHubWordsBtn'),
+        vocabFileInput: document.getElementById('vocabFileInput'),
+        chooseJsonFileBtn: document.getElementById('chooseJsonFileBtn'),
+        applyAndRestartNowBtn: document.getElementById('applyAndRestartNowBtn'),
+        vocabValidationBox: document.getElementById('vocabValidationBox')
+      };
+
+      function shuffleArray(array) {
+        const arr = array.slice();
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const temp = arr[i]; arr[i] = arr[j]; arr[j] = temp;
+        }
+        return arr;
+      }
+
+      function validateAndNormalizeVocabulary(rawList) {
+        if (!Array.isArray(rawList)) {
+          return { valid: false, error: 'Root JSON structure must be an Array of vocabulary objects.' };
+        }
+        if (rawList.length < 4) {
+          return { valid: false, error: `At least 4 distinct vocabulary entries are required (found ${rawList.length}).` };
+        }
+
+        const seenWords = new Set();
+        const seenSynonyms = new Set();
+        const normalized = [];
+
+        for (let i = 0; i < rawList.length; i++) {
+          const item = rawList[i];
+          const rowNum = i + 1;
+          if (!item || typeof item !== 'object' || Array.isArray(item)) {
+            return { valid: false, error: `Entry #${rowNum} is not a valid object.` };
+          }
+          if (!item.word || !item.translation || !item.synonym) {
+            return { valid: false, error: `Entry #${rowNum} is missing "word", "translation", or "synonym".` };
+          }
+          const word = String(item.word).trim();
+          const translation = String(item.translation).trim();
+          const synonym = String(item.synonym).trim();
+
+          const wordKey = word.toLowerCase();
+          const synKey = synonym.toLowerCase();
+          if (wordKey === synKey) {
+            return { valid: false, error: `Entry #${rowNum} ("${word}") cannot have the same synonym.` };
+          }
+          if (seenWords.has(wordKey)) {
+            return { valid: false, error: `Duplicate original word: "${word}".` };
+          }
+
+          seenWords.add(wordKey);
+          seenSynonyms.add(synKey);
+          normalized.push({ id: `vocab_${String(i + 1).padStart(3, '0')}`, word, translation, synonym });
+        }
+        return { valid: true, entries: normalized };
+      }
+
+      // FETCH WORDS.JSON DIRECTLY FROM GITHUB REPO
+      async function loadWordsLibraryFromGitHub(isManualReload = false) {
+        try {
+          const response = await fetch('words.json?nocache=' + Date.now());
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          const rawData = await response.json();
+          const validation = validateAndNormalizeVocabulary(rawData);
+
+          if (!validation.valid) {
+            throw new Error(validation.error);
+          }
+
+          state.vocabLibrary = validation.entries;
+          state.unusedPoolIds = shuffleArray(state.vocabLibrary.map((e) => e.id));
+          updateVocabModalStatus();
+
+          if (isManualReload) {
+            showVocabValidationMessage(`Successfully loaded ${validation.entries.length} words from words.json!`, false);
+          }
+        } catch (err) {
+          console.warn('Could not load words.json, using fallback:', err);
+          if (state.vocabLibrary.length === 0) {
+            const fallbackValidation = validateAndNormalizeVocabulary(FALLBACK_VOCAB_JSON);
+            state.vocabLibrary = fallbackValidation.entries;
+            state.unusedPoolIds = shuffleArray(state.vocabLibrary.map((e) => e.id));
+          }
+          updateVocabModalStatus();
+          if (isManualReload) {
+            showVocabValidationMessage(`Failed to fetch words.json: ${err.message}. Using current library.`, true);
+          }
+        }
+      }
+
+      function selectFourRoundEntries() {
+        if (state.vocabLibrary.length < 4) return null;
+        if (state.pendingVocabLibrary) {
+          state.vocabLibrary = state.pendingVocabLibrary;
+          state.pendingVocabLibrary = null;
+          state.unusedPoolIds = shuffleArray(state.vocabLibrary.map((e) => e.id));
+          updateVocabModalStatus();
+        }
+        if (state.unusedPoolIds.length < 4) {
+          state.unusedPoolIds = shuffleArray(state.vocabLibrary.map((e) => e.id));
+        }
+        const chosenIds = state.unusedPoolIds.slice(0, 4);
+        const chosenEntries = chosenIds.map((id) => state.vocabLibrary.find((item) => item.id === id)).filter(Boolean);
+        state.unusedPoolIds = state.unusedPoolIds.slice(4);
+        return chosenEntries;
+      }
+
+      function generateDecorativeCardFaces(count = 8) {
+        const deck = [];
+        for (const rank of CARD_RANKS) {
+          for (const suit of CARD_SUITS) {
+            deck.push({ rank, suit });
+          }
+        }
+        return shuffleArray(deck).slice(0, count);
+      }
+
+      function buildHandsForRound(fourEntries) {
+        const decorativeFaces = generateDecorativeCardFaces(8);
+        const opponentEntries = shuffleArray(fourEntries);
+        let studentEntries = shuffleArray(fourEntries);
+        let attempts = 0;
+        while (attempts < 6 && studentEntries.every((entry, idx) => entry.id === opponentEntries[idx].id)) {
+          studentEntries = shuffleArray(fourEntries);
+          attempts++;
+        }
+
+        const opponentHand = opponentEntries.map((entry, idx) => ({
+          slotIndex: idx, vocabId: entry.id, word: entry.word, translation: entry.translation,
+          rank: decorativeFaces[idx].rank, suit: decorativeFaces[idx].suit, resolved: false, outcome: null
+        }));
+
+        const studentHand = studentEntries.map((entry, idx) => ({
+          slotIndex: idx, vocabId: entry.id, synonym: entry.synonym,
+          rank: decorativeFaces[idx + 4].rank, suit: decorativeFaces[idx + 4].suit, used: false, outcome: null
+        }));
+
+        return { opponentHand, studentHand };
+      }
+
+      function getWordFontSizeClass(text, isSynonym = false) {
+        const len = (text || '').length;
+        if (len >= 15) return 'text-xs sm:text-sm';
+        if (len >= 11) return 'text-sm sm:text-base';
+        return 'text-base sm:text-lg';
+      }
+
+      function getBisonSkullCardBackHTML() {
+        return `
+          <div class="card-face card-back">
+            <div class="relative w-full h-full flex flex-col items-center justify-center p-2">
+              <div class="absolute top-2.5 left-2.5 w-2.5 h-2.5 border-t border-l border-[#D4AF37]"></div>
+              <div class="absolute top-2.5 right-2.5 w-2.5 h-2.5 border-t border-r border-[#D4AF37]"></div>
+              <div class="absolute bottom-2.5 left-2.5 w-2.5 h-2.5 border-b border-l border-[#D4AF37]"></div>
+              <div class="absolute bottom-2.5 right-2.5 w-2.5 h-2.5 border-b border-r border-[#D4AF37]"></div>
+              <svg viewBox="0 0 80 72" class="w-11 h-11 sm:w-12 sm:h-12 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                <circle cx="40" cy="37" r="24" fill="#1E0B06" stroke="#D4AF37" stroke-width="1.5" stroke-dasharray="3 2"/>
+                <path d="M14 25 C6 15, 14 5, 22 14 C25 18, 25 24, 25 24 L55 24 C55 24, 55 18, 58 14 C66 5, 74 15, 66 25 C60 31, 53 30, 53 30 L27 30 C27 30, 20 31, 14 25 Z" fill="#D4AF37" stroke="#1E110A" stroke-width="1.6"/>
+                <path d="M26 22 L54 22 L50 44 L44 60 L36 60 L30 44 Z" fill="#F6EBD8" stroke="#1E110A" stroke-width="1.8"/>
+                <polygon points="40,26 43,31 40,36 37,31" fill="#9E2A2B"/>
+                <circle cx="32" cy="37" r="3.6" fill="#1E110A"/>
+                <circle cx="48" cy="37" r="3.6" fill="#1E110A"/>
+                <polygon points="40,44 36.5,53 43.5,53" fill="#1E110A"/>
+              </svg>
+              <span class="mt-0.5 font-western text-[8px] tracking-widest text-[#D4AF37] uppercase">MATCHED</span>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderHands(withDealAnimation = false) {
+        dom.opponentGrid.innerHTML = state.opponentHand.map((card, idx) => {
+          const wordSize = getWordFontSizeClass(card.word, false);
+          const isFlipped = card.resolved && card.outcome === 'correct';
+          const isActive = (state.gameState === GAME_STATES.PLAYING || state.gameState === GAME_STATES.RESOLVING) && idx === state.activeOpponentIndex && !card.resolved;
+          const stateClasses = ['playing-card opponent-card', withDealAnimation ? 'dealing-start' : '', isFlipped ? 'is-flipped' : '', isActive ? 'active-target' : ''].filter(Boolean).join(' ');
+
+          return `
+            <div class="card-slot" data-opponent-slot="${idx}">
+              <div id="oppCard_${idx}" class="${stateClasses}" data-vocab-id="${card.vocabId}">
+                <div class="card-face card-front">
+                  <div class="card-corner top-left ${card.suit.colorClass}"><span>${card.rank}</span><span>${card.suit.symbol}</span></div>
+                  <div class="corner-ornament tr"></div><div class="corner-ornament bl"></div>
+                  ${isActive ? `<div data-target-badge="true" class="absolute top-1.5 px-2 py-0.2 rounded-full bg-[#9E2A2B] border border-[#D4AF37] text-[8px] font-bold tracking-widest text-[#F6EBD8] uppercase shadow-sm">TARGET</div>` : ''}
+                  <div class="card-word-text font-card-word ${wordSize}">${escapeHTML(card.word)}</div>
+                  <div class="card-vi-text text-[11px] sm:text-xs">${escapeHTML(card.translation)}</div>
+                  <div class="card-corner bottom-right ${card.suit.colorClass}"><span>${card.rank}</span><span>${card.suit.symbol}</span></div>
+                </div>
+                ${getBisonSkullCardBackHTML()}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        dom.studentGrid.innerHTML = state.studentHand.map((card, idx) => {
+          const synSize = getWordFontSizeClass(card.synonym, true);
+          const isFlipped = card.used && card.outcome === 'correct';
+          const isSelectable = state.gameState === GAME_STATES.PLAYING && !card.used;
+          const stateClasses = ['playing-card', withDealAnimation ? 'dealing-start' : '', isFlipped ? 'is-flipped' : '', isSelectable ? 'student-selectable' : 'cursor-default'].filter(Boolean).join(' ');
+
+          return `
+            <div class="card-slot" data-student-slot="${idx}">
+              <div id="stuCard_${idx}" class="${stateClasses}" data-student-index="${idx}" data-vocab-id="${card.vocabId}" role="button" tabindex="${isSelectable ? '0' : '-1'}">
+                <div class="card-face card-front">
+                  <div class="card-corner top-left ${card.suit.colorClass}"><span>${card.rank}</span><span>${card.suit.symbol}</span></div>
+                  <div class="corner-ornament tr"></div><div class="corner-ornament bl"></div>
+                  <div class="card-synonym-text ${synSize}">${escapeHTML(card.synonym)}</div>
+                  <div class="card-corner bottom-right ${card.suit.colorClass}"><span>${card.rank}</span><span>${card.suit.symbol}</span></div>
+                </div>
+                ${getBisonSkullCardBackHTML()}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        dom.studentGrid.querySelectorAll('[data-student-index]').forEach((el) => {
+          el.addEventListener('click', () => {
+            handleStudentCardSelect(parseInt(el.getAttribute('data-student-index'), 10));
+          });
+        });
+      }
+
+      function renderChipStack(previousChips = state.chips) {
+        dom.chipCountValue.textContent = String(state.chips);
+        const slots = [];
+        for (let i = 1; i <= 10; i++) {
+          const isFilled = i <= state.chips;
+          const wasFilled = i <= previousChips;
+          let animClass = '';
+          if (isFilled && !wasFilled) animClass = 'chip-gain-anim';
+          if (!isFilled && wasFilled) animClass = 'chip-loss-anim';
+
+          slots.push(isFilled || (!isFilled && wasFilled) ? `
+            <div class="chip-token w-4 h-4 sm:w-4.5 sm:h-4.5 ${animClass}">
+              <svg viewBox="0 0 28 28" class="w-full h-full">
+                <circle cx="14" cy="14" r="12" fill="${i === 10 ? '#D4AF37' : '#9E2A2B'}" stroke="#F3D060" stroke-width="2"/>
+                <circle cx="14" cy="14" r="9" fill="none" stroke="#F6EBD8" stroke-width="1.5" stroke-dasharray="3 2.5"/>
+                <circle cx="14" cy="14" r="4" fill="#1E110A"/>
+              </svg>
+            </div>
+          ` : `<div class="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full border border-[#D4AF37]/25 bg-[#1B0E08]/60"></div>`);
+        }
+        dom.chipStackContainer.innerHTML = slots.join('');
+      }
+
+      function updateHUD() {
+        dom.roundCounterText.textContent = `ROUND ${state.round}`;
+        const total = state.vocabLibrary.length;
+        const usedInCycle = total - state.unusedPoolIds.length;
+        dom.deckProgressText.textContent = `DECK ${Math.min(usedInCycle, total)}/${total}`;
+        dom.turnCounterBadge.textContent = `CARD ${Math.min(state.activeOpponentIndex + 1, 4)} OF 4`;
+        dom.roundMatchTracker.textContent = `${state.roundCorrectCount} / 4 MATCHED`;
+        dom.cowboySpeech.textContent = '“Make your move.”';
+      }
+
+      function startNewRound() {
+        if (state.gameState === GAME_STATES.VICTORY || state.gameState === GAME_STATES.DEFEAT) return;
+
+        const fourEntries = selectFourRoundEntries();
+        if (!fourEntries) {
+          showTableStatus('INVALID VOCABULARY POOL');
+          return;
+        }
+
+        state.gameState = GAME_STATES.DEALING;
+        state.activeOpponentIndex = 0;
+        state.roundCorrectCount = 0;
+        state.roundIncorrectAttempts = 0;
+        state.roundScored = false;
+
+        const { opponentHand, studentHand } = buildHandsForRound(fourEntries);
+        state.opponentHand = opponentHand;
+        state.studentHand = studentHand;
+
+        hideRoundResultToast();
+        updateHUD();
+        showTableStatus('DEALING NEW HAND...');
+        dom.turnStatusSubtext.textContent = 'Shuffling the deck...';
+
+        renderHands(true);
+        sound.playCardShuffle();
+
+        const dealOrder = ['oppCard_0', 'stuCard_0', 'oppCard_1', 'stuCard_1', 'oppCard_2', 'stuCard_2', 'oppCard_3', 'stuCard_3'];
+        dealOrder.forEach((cardDomId, index) => {
+          scheduleTimer(() => {
+            const el = document.getElementById(cardDomId);
+            if (!el) return;
+            el.classList.remove('dealing-start');
+            el.classList.add('dealing-animate');
+            sound.playCardDeal();
+            scheduleTimer(() => sound.playCardPlace(), 260);
+          }, 260 + index * 175);
+        });
+
+        scheduleTimer(() => {
+          state.gameState = GAME_STATES.PLAYING;
+          dom.turnStatusSubtext.textContent = 'Match the highlighted card';
+          showTableStatus('TAP THE MATCHING SYNONYM');
+          updateActiveCardStates();
+        }, 260 + dealOrder.length * 175 + 280);
+      }
+
+      function updateActiveCardStates() {
+        state.opponentHand.forEach((card, idx) => {
+          const el = document.getElementById(`oppCard_${idx}`);
+          if (!el) return;
+          const isActive = (state.gameState === GAME_STATES.PLAYING || state.gameState === GAME_STATES.RESOLVING) && idx === state.activeOpponentIndex && !card.resolved;
+          el.classList.toggle('active-target', isActive);
+          const front = el.querySelector('.card-front');
+          const existingBadge = front.querySelector('[data-target-badge]');
+          if (existingBadge) existingBadge.remove();
+          if (isActive) {
+            const badge = document.createElement('div');
+            badge.setAttribute('data-target-badge', 'true');
+            badge.className = 'absolute top-1.5 px-2 py-0.2 rounded-full bg-[#9E2A2B] border border-[#D4AF37] text-[8px] font-bold tracking-widest text-[#F6EBD8] uppercase shadow-sm';
+            badge.textContent = 'TARGET';
+            front.appendChild(badge);
+          }
+        });
+
+        state.studentHand.forEach((card, idx) => {
+          const el = document.getElementById(`stuCard_${idx}`);
+          if (!el) return;
+          const isSelectable = state.gameState === GAME_STATES.PLAYING && !card.used;
+          el.classList.toggle('student-selectable', isSelectable);
+        });
+        updateHUD();
+      }
+
+      function handleStudentCardSelect(studentIndex) {
+        if (state.gameState !== GAME_STATES.PLAYING) return;
+        sound.playCardSelect();
+
+        const oppIndex = state.activeOpponentIndex;
+        const oppCard = state.opponentHand[oppIndex];
+        const stuCard = state.studentHand[studentIndex];
+        if (!oppCard || !stuCard || oppCard.resolved || stuCard.used) return;
+
+        state.gameState = GAME_STATES.RESOLVING;
+        updateActiveCardStates();
+
+        const oppEl = document.getElementById(`oppCard_${oppIndex}`);
+        const stuEl = document.getElementById(`stuCard_${studentIndex}`);
+
+        if (oppCard.vocabId === stuCard.vocabId) {
+          oppCard.resolved = true; oppCard.outcome = 'correct';
+          stuCard.used = true; stuCard.outcome = 'correct';
+          state.roundCorrectCount += 1;
+
+          if (oppEl) { oppEl.classList.remove('active-target'); oppEl.classList.add('correct-flash'); }
+          if (stuEl) stuEl.classList.add('correct-flash');
+
+          sound.playCorrectMatch();
+          showTableStatus('SHARP SHOOTING! MATCH CONFIRMED');
+          dom.turnStatusSubtext.textContent = `${oppCard.word} = ${stuCard.synonym}`;
+          updateHUD();
+
+          scheduleTimer(() => {
+            if (oppEl) { oppEl.classList.remove('correct-flash'); oppEl.classList.add('is-flipped'); }
+            if (stuEl) { stuEl.classList.remove('correct-flash'); stuEl.classList.add('is-flipped'); }
+            sound.playCardDeal(0.06, 1000);
+          }, 280);
+
+          scheduleTimer(() => {
+            const nextIndex = state.opponentHand.findIndex((c) => !c.resolved);
+            if (nextIndex !== -1) {
+              state.activeOpponentIndex = nextIndex;
+              state.gameState = GAME_STATES.PLAYING;
+              dom.turnStatusSubtext.textContent = 'Match the highlighted card';
+              showTableStatus('SELECT MATCHING SYNONYM');
+              updateActiveCardStates();
+            } else {
+              completeCurrentRound();
+            }
+          }, 820);
+        } else {
+          state.roundIncorrectAttempts += 1;
+          const prevChips = state.chips;
+          state.chips = Math.max(0, prevChips - 2);
+
+          renderChipStack(prevChips);
+          sound.playChipLoss();
+          if (stuEl) stuEl.classList.add('wrong-flash');
+          sound.playAngryNoVoice();
+          sound.playGunshot();
+          scheduleTimer(() => sound.playBulletWhizz(), 95);
+
+          dom.gameFrame.classList.remove('screen-shake');
+          void dom.gameFrame.offsetWidth;
+          dom.gameFrame.classList.add('screen-shake');
+
+          showTableStatus('MISFIRE! -2 CHIPS — TRY AGAIN');
+          dom.turnStatusSubtext.textContent = 'Wrong card — try another synonym!';
+          updateHUD();
+
+          if (state.chips <= 0) {
+            scheduleTimer(() => triggerTerminalEnding(false), 650);
+            return;
+          }
+
+          scheduleTimer(() => {
+            if (stuEl) stuEl.classList.remove('wrong-flash');
+            state.gameState = GAME_STATES.PLAYING;
+            dom.turnStatusSubtext.textContent = 'Match the highlighted card';
+            showTableStatus('SELECT MATCHING SYNONYM');
+            updateActiveCardStates();
+          }, 580);
+        }
+      }
+
+      function completeCurrentRound() {
+        if (state.roundScored) return;
+        state.roundScored = true;
+        state.gameState = GAME_STATES.ROUND_COMPLETE;
+
+        const prevChips = state.chips;
+        state.chips = Math.min(10, prevChips + 1);
+        renderChipStack(prevChips);
+        sound.playChipGain();
+
+        dom.roundResultTitle.textContent = 'ROUND BONUS: +1 CHIP';
+        dom.roundResultSub.textContent = 'All 4 pairs correctly matched!';
+        dom.roundResultToast.classList.remove('opacity-0', 'scale-90');
+        dom.roundResultToast.classList.add('opacity-100', 'scale-100');
+        showTableStatus('ROUND BONUS: +1 CHIP');
+
+        if (state.chips >= 10) {
+          scheduleTimer(() => triggerTerminalEnding(true), 950);
+          return;
+        }
+
+        scheduleTimer(() => {
+          state.round += 1;
+          startNewRound();
+        }, 1650);
+      }
+
+      function hideRoundResultToast() {
+        dom.roundResultToast.classList.remove('opacity-100', 'scale-100');
+        dom.roundResultToast.classList.add('opacity-0', 'scale-90');
+      }
+
+      function showTableStatus(text) { dom.tableStatusText.textContent = text; }
+
+      function triggerTerminalEnding(isVictory) {
+        clearAllScheduledTimers();
+        state.gameState = isVictory ? GAME_STATES.VICTORY : GAME_STATES.DEFEAT;
+        hideRoundResultToast();
+
+        dom.endingBadge.textContent = isVictory ? '10 CHIPS REACHED · SHOWDOWN WON' : 'OUT OF CHIPS · BUSTED';
+        dom.endingExactMessage.textContent = isVictory ? '“you won? but at what cost?”' : '“Reckon you need a bit more practice, partner.”';
+        dom.endingStatsSummary.textContent = `Final Chips: ${state.chips} · Rounds Completed: ${state.round}`;
+
+        dom.endingOverlay.classList.remove('hidden');
+        dom.endingOverlay.classList.add('flex');
+        sound.playTripleGunshots();
+        sound.playCowboyGuitarEnding(isVictory);
+
+        scheduleTimer(() => {
+          dom.endingCardBox.classList.remove('opacity-0', 'translate-y-4');
+          dom.endingCardBox.classList.add('opacity-100', 'translate-y-0');
+        }, 580);
+      }
+
+      function restartGame() {
+        clearAllScheduledTimers();
+        if (state.pendingVocabLibrary) {
+          state.vocabLibrary = state.pendingVocabLibrary;
+          state.pendingVocabLibrary = null;
+        }
+        state.gameState = GAME_STATES.READY;
+        state.chips = 5;
+        state.round = 1;
+        state.activeOpponentIndex = 0;
+        state.roundCorrectCount = 0;
+        state.roundScored = false;
+        state.unusedPoolIds = shuffleArray(state.vocabLibrary.map((e) => e.id));
+
+        dom.endingOverlay.classList.add('hidden');
+        dom.endingOverlay.classList.remove('flex');
+        dom.endingCardBox.classList.add('opacity-0', 'translate-y-4');
+        dom.endingCardBox.classList.remove('opacity-100', 'translate-y-0');
+
+        renderChipStack(5);
+        updateVocabModalStatus();
+        startNewRound();
+      }
+
+      function toggleSound() {
+        state.soundEnabled = !state.soundEnabled;
+        dom.soundOnIcon.classList.toggle('hidden', !state.soundEnabled);
+        dom.soundOffIcon.classList.toggle('hidden', state.soundEnabled);
+        if (state.soundEnabled) sound.ensureContext();
+      }
+
+      function updateVocabModalStatus() {
+        dom.activeLibraryCount.textContent = `${state.vocabLibrary.length} Valid Word Pairs`;
+        const hasPending = Boolean(state.pendingVocabLibrary);
+        dom.pendingLibraryBadge.classList.toggle('hidden', !hasPending);
+        dom.applyAndRestartNowBtn.classList.toggle('hidden', !hasPending);
+      }
+
+      function showVocabValidationMessage(message, isError) {
+        dom.vocabValidationBox.classList.remove('hidden');
+        dom.vocabValidationBox.className = isError
+          ? 'p-3 rounded-xl border border-[#C83E3B] bg-[#3B1010] text-[#FFD4D4] text-xs leading-relaxed'
+          : 'p-3 rounded-xl border border-[#D4AF37] bg-[#143321] text-[#E6F9ED] text-xs leading-relaxed';
+        dom.vocabValidationBox.textContent = message;
+      }
+
+      function escapeHTML(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+
+      async function initGame() {
+        await loadWordsLibraryFromGitHub();
+
+        document.addEventListener('pointerdown', () => {
+          if (state.soundEnabled) sound.ensureContext();
+        }, { once: true });
+
+        dom.restartBtn.addEventListener('click', () => { sound.ensureContext(); restartGame(); });
+        dom.playAgainBtn.addEventListener('click', () => { sound.ensureContext(); restartGame(); });
+        dom.soundToggleBtn.addEventListener('click', toggleSound);
+
+        dom.vocabBtn.addEventListener('click', () => {
+          updateVocabModalStatus();
+          dom.vocabModal.classList.remove('hidden');
+        });
+
+        dom.closeVocabModalBtn.addEventListener('click', () => dom.vocabModal.classList.add('hidden'));
+        dom.vocabModal.addEventListener('click', (e) => { if (e.target === dom.vocabModal) dom.vocabModal.classList.add('hidden'); });
+
+        // Reload/Fetch words.json directly from GitHub Pages repository
+        dom.reloadGitHubWordsBtn.addEventListener('click', async () => {
+          showVocabValidationMessage('Fetching latest words.json from GitHub...', false);
+          await loadWordsLibraryFromGitHub(true);
+          restartGame();
+        });
+
+        dom.chooseJsonFileBtn.addEventListener('click', () => dom.vocabFileInput.click());
+        dom.vocabFileInput.addEventListener('change', (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (event) => {
+            try {
+              const parsed = JSON.parse(String(event.target.result || ''));
+              const validation = validateAndNormalizeVocabulary(parsed);
+              if (!validation.valid) {
+                showVocabValidationMessage(`Error: ${validation.error}`, true);
+                return;
+              }
+              state.vocabLibrary = validation.entries;
+              showVocabValidationMessage(`Loaded ${validation.entries.length} words! Restarting...`, false);
+              restartGame();
+            } catch (err) {
+              showVocabValidationMessage('Invalid JSON format.', true);
+            }
+          };
+          reader.readAsText(file, 'UTF-8');
+        });
+
+        dom.applyAndRestartNowBtn.addEventListener('click', () => {
+          dom.vocabModal.classList.add('hidden');
+          restartGame();
+        });
+
+        renderChipStack(5);
+        updateVocabModalStatus();
+        startNewRound();
+      }
+
+      window.addEventListener('DOMContentLoaded', initGame);
+    })();
+  </script>
+</body>
+</html>
