@@ -1,0 +1,1047 @@
+[
+  {
+    "word": "substantial",
+    "translation": "đáng kể",
+    "synonym": "considerable"
+  },
+  {
+    "word": "allocate",
+    "translation": "phân bổ",
+    "synonym": "assign"
+  },
+  {
+    "word": "sustainable",
+    "translation": "bền vững",
+    "synonym": "viable"
+  },
+  {
+    "word": "initiative",
+    "translation": "sáng kiến",
+    "synonym": "proposal"
+  },
+  {
+    "word": "inevitable",
+    "translation": "không thể tránh khỏi",
+    "synonym": "unavoidable"
+  },
+  {
+    "word": "meticulous",
+    "translation": "tỉ mỉ",
+    "synonym": "thorough"
+  },
+  {
+    "word": "ambiguous",
+    "translation": "mơ hồ",
+    "synonym": "vague"
+  },
+  {
+    "word": "deteriorate",
+    "translation": "xấu đi",
+    "synonym": "worsen"
+  },
+  {
+    "word": "augment",
+    "translation": "làm tăng thêm",
+    "synonym": "increase"
+  },
+  {
+    "word": "obsolete",
+    "translation": "lỗi thời",
+    "synonym": "outdated"
+  },
+  {
+    "word": "resilient",
+    "translation": "kiên cường",
+    "synonym": "tough"
+  },
+  {
+    "word": "scrutinize",
+    "translation": "xem xét kỹ",
+    "synonym": "examine"
+  },
+  {
+    "word": "lucrative",
+    "translation": "sinh lời cao",
+    "synonym": "profitable"
+  },
+  {
+    "word": "mitigate",
+    "translation": "giảm nhẹ",
+    "synonym": "alleviate"
+  },
+  {
+    "word": "plausible",
+    "translation": "hợp lý",
+    "synonym": "believable"
+  },
+  {
+    "word": "adversity",
+    "translation": "nghịch cảnh",
+    "synonym": "hardship"
+  },
+  {
+    "word": "concur",
+    "translation": "đồng tình",
+    "synonym": "agree"
+  },
+  {
+    "word": "reluctant",
+    "translation": "miễn cưỡng",
+    "synonym": "hesitant"
+  },
+  {
+    "word": "pivotal",
+    "translation": "then chốt",
+    "synonym": "crucial"
+  },
+  {
+    "word": "candid",
+    "translation": "thẳng thắn",
+    "synonym": "frank"
+  },
+  {
+    "word": "academic",
+    "translation": "thuộc về học thuật",
+    "synonym": "scholastic"
+  },
+  {
+    "word": "curriculum",
+    "translation": "chương trình giảng dạy",
+    "synonym": "syllabus"
+  },
+  {
+    "word": "literacy",
+    "translation": "khả năng đọc viết, trình độ học vấn",
+    "synonym": "proficiency"
+  },
+  {
+    "word": "assessment",
+    "translation": "sự đánh giá, định giá",
+    "synonym": "evaluation"
+  },
+  {
+    "word": "enrollment",
+    "translation": "sự ghi danh, số lượng nhập học",
+    "synonym": "registration"
+  },
+  {
+    "word": "scholarship",
+    "translation": "học bổng",
+    "synonym": "grant"
+  },
+  {
+    "word": "tuition",
+    "translation": "học phí",
+    "synonym": "schooling"
+  },
+  {
+    "word": "cognition",
+    "translation": "nhận thức, quá trình nhận thức",
+    "synonym": "perception"
+  },
+  {
+    "word": "didactic",
+    "translation": "mang tính giáo huấn, dạy bảo",
+    "synonym": "instructive"
+  },
+  {
+    "word": "empathy",
+    "translation": "sự thấu cảm",
+    "synonym": "compassion"
+  },
+  {
+    "word": "facilitator",
+    "translation": "người hỗ trợ, người điều phối",
+    "synonym": "moderator"
+  },
+  {
+    "word": "matriculate",
+    "translation": "trúng tuyển đại học, nhập học",
+    "synonym": "admit"
+  },
+  {
+    "word": "nurture",
+    "translation": "nuôi dưỡng, bồi dưỡng",
+    "synonym": "cultivate"
+  },
+  {
+    "word": "remedial",
+    "translation": "mang tính bồi dưỡng, khắc phục",
+    "synonym": "corrective"
+  },
+  {
+    "word": "seminar",
+    "translation": "buổi hội thảo chuyên đề",
+    "synonym": "workshop"
+  },
+  {
+    "word": "tenure",
+    "translation": "nhiệm kỳ, sự chính thức biên chế",
+    "synonym": "permanence"
+  },
+  {
+    "word": "undergraduate",
+    "translation": "sinh viên chưa tốt nghiệp đại học",
+    "synonym": "student"
+  },
+  {
+    "word": "vocational",
+    "translation": "thuộc về học nghề, hướng nghiệp",
+    "synonym": "occupational"
+  },
+  {
+    "word": "pediatrician",
+    "translation": "bác sĩ nhi khoa",
+    "synonym": "paediatrician"
+  },
+  {
+    "word": "epidemic",
+    "translation": "dịch bệnh bùng phát",
+    "synonym": "outbreak"
+  },
+  {
+    "word": "pathogen",
+    "translation": "mầm bệnh, tác nhân gây bệnh",
+    "synonym": "germ"
+  },
+  {
+    "word": "hygiene",
+    "translation": "vệ sinh phòng bệnh",
+    "synonym": "sanitation"
+  },
+  {
+    "word": "longevity",
+    "translation": "tuổi thọ",
+    "synonym": "lifespan"
+  },
+  {
+    "word": "metabolism",
+    "translation": "sự trao đổi chất",
+    "synonym": "catabolism"
+  },
+  {
+    "word": "pharmaceutical",
+    "translation": "thuộc về dược phẩm",
+    "synonym": "medicinal"
+  },
+  {
+    "word": "rehabilitation",
+    "translation": "sự phục hồi chức năng",
+    "synonym": "recovery"
+  },
+  {
+    "word": "vaccination",
+    "translation": "sự tiêm chủng",
+    "synonym": "immunization"
+  },
+  {
+    "word": "malnutrition",
+    "translation": "tình trạng suy dinh dưỡng",
+    "synonym": "undernourishment"
+  },
+  {
+    "word": "stethoscope",
+    "translation": "ống nghe y tế",
+    "synonym": "monitor"
+  },
+  {
+    "word": "anatomy",
+    "translation": "giải phẫu học",
+    "synonym": "structure"
+  },
+  {
+    "word": "physiology",
+    "translation": "sinh lý học",
+    "synonym": "function"
+  },
+  {
+    "word": "psychiatry",
+    "translation": "khoa tâm thần học",
+    "synonym": "psychology"
+  },
+  {
+    "word": "autodidact",
+    "translation": "người tự học",
+    "synonym": "self-learner"
+  },
+  {
+    "word": "coeducation",
+    "translation": "giáo dục chung nam nữ",
+    "synonym": "coed"
+  },
+  {
+    "word": "colloquium",
+    "translation": "buổi thảo luận học thuật",
+    "synonym": "symposium"
+  },
+  {
+    "word": "dissertation",
+    "translation": "luận án tiến sĩ, thạc sĩ",
+    "synonym": "thesis"
+  },
+  {
+    "word": "extracurricular",
+    "translation": "ngoại khóa",
+    "synonym": "co-curricular"
+  },
+  {
+    "word": "polymath",
+    "translation": "bậc kỳ tài, người uyên bác",
+    "synonym": "scholar"
+  },
+  {
+    "word": "practicum",
+    "translation": "thực tập chuyên môn",
+    "synonym": "internship"
+  },
+  {
+    "word": "proctor",
+    "translation": "giám thị coi thi",
+    "synonym": "invigilator"
+  },
+  {
+    "word": "sabbatical",
+    "translation": "kỳ nghỉ phép nghiên cứu",
+    "synonym": "leave"
+  },
+  {
+    "word": "valedictorian",
+    "translation": "sinh viên thủ khoa phát biểu",
+    "synonym": "top-student"
+  },
+  {
+    "word": "alumnus",
+    "translation": "cựu học sinh, sinh viên",
+    "synonym": "graduate"
+  },
+  {
+    "word": "credential",
+    "translation": "giấy chứng nhận, tín nhiệm",
+    "synonym": "certification"
+  },
+  {
+    "word": "dyslexia",
+    "translation": "chứng khó đọc",
+    "synonym": "reading-disorder"
+  },
+  {
+    "word": "epistemology",
+    "translation": "nhận thức luận",
+    "synonym": "gnoseology"
+  },
+  {
+    "word": "faculty",
+    "translation": "khoa trong trường / đội ngũ giảng viên",
+    "synonym": "staff"
+  },
+  {
+    "word": "interdisciplinary",
+    "translation": "liên ngành",
+    "synonym": "cross-disciplinary"
+  },
+  {
+    "word": "lectern",
+    "translation": "bục giảng",
+    "synonym": "podium"
+  },
+  {
+    "word": "monograph",
+    "translation": "sách chuyên khảo",
+    "synonym": "treatise"
+  },
+  {
+    "word": "numeracy",
+    "translation": "khả năng tính toán, toán cơ bản",
+    "synonym": "arithmetic"
+  },
+  {
+    "word": "postgraduate",
+    "translation": "sau đại học",
+    "synonym": "graduate-level"
+  },
+  {
+    "word": "prerequisite",
+    "translation": "điều kiện tiên quyết",
+    "synonym": "requirement"
+  },
+  {
+    "word": "prospectus",
+    "translation": "tờ giới thiệu tuyển sinh",
+    "synonym": "brochure"
+  },
+  {
+    "word": "recitation",
+    "translation": "sự ngâm thơ, trả bài miệng",
+    "synonym": "reading"
+  },
+  {
+    "word": "rubric",
+    "translation": "thang điểm đánh giá, quy tắc",
+    "synonym": "guideline"
+  },
+  {
+    "word": "tutorial",
+    "translation": "buổi học kèm, hướng dẫn",
+    "synonym": "coaching"
+  },
+  {
+    "word": "antidote",
+    "translation": "thuốc giải độc",
+    "synonym": "counteragent"
+  },
+  {
+    "word": "arrhythmia",
+    "translation": "chứng rối loạn nhịp tim",
+    "synonym": "irregular-heartbeat"
+  },
+  {
+    "word": "arthritis",
+    "translation": "bệnh viêm khớp",
+    "synonym": "joint-inflammation"
+  },
+  {
+    "word": "asymptomatic",
+    "translation": "không có triệu chứng",
+    "synonym": "silent"
+  },
+  {
+    "word": "benign",
+    "translation": "lành tính (khối u/bệnh)",
+    "synonym": "harmless"
+  },
+  {
+    "word": "biopsy",
+    "translation": "sinh thiết",
+    "synonym": "tissue-sampling"
+  },
+  {
+    "word": "carcinogen",
+    "translation": "chất gây ung thư",
+    "synonym": "cancer-causer"
+  },
+  {
+    "word": "chemotherapy",
+    "translation": "hóa trị liệu",
+    "synonym": "chemo"
+  },
+  {
+    "word": "cholesterol",
+    "translation": "chất béo cholesterol trong máu",
+    "synonym": "lipid"
+  },
+  {
+    "word": "chronic",
+    "translation": "mãn tính",
+    "synonym": "longstanding"
+  },
+  {
+    "word": "contagious",
+    "translation": "lây nhiễm, dễ truyền nhiễm",
+    "synonym": "infectious"
+  },
+  {
+    "word": "convalescence",
+    "translation": "thời kỳ bình phục",
+    "synonym": "recuperation"
+  },
+  {
+    "word": "deficiency",
+    "translation": "sự thiếu hụt chất/dinh dưỡng",
+    "synonym": "shortage"
+  },
+  {
+    "word": "dementia",
+    "translation": "bệnh mất trí nhớ, sa sút trí tuệ",
+    "synonym": "senility"
+  },
+  {
+    "word": "diabetes",
+    "translation": "bệnh tiểu đường",
+    "synonym": "hyperglycemia"
+  },
+  {
+    "word": "diagnosis",
+    "translation": "sự chẩn đoán bệnh",
+    "synonym": "identification"
+  },
+  {
+    "word": "dialysis",
+    "translation": "chạy thận nhân tạo",
+    "synonym": "filtration"
+  },
+  {
+    "word": "diuretic",
+    "translation": "thuốc lợi tiểu",
+    "synonym": "water-pill"
+  },
+  {
+    "word": "dosage",
+    "translation": "liều lượng thuốc",
+    "synonym": "amount"
+  },
+  {
+    "word": "dyspnea",
+    "translation": "chứng khó thở",
+    "synonym": "breathlessness"
+  },
+  {
+    "word": "endemic",
+    "translation": "bệnh lưu hành địa phương",
+    "synonym": "localized"
+  },
+  {
+    "word": "epidemiology",
+    "translation": "dịch tễ học",
+    "synonym": "disease-study"
+  },
+  {
+    "word": "epilepsy",
+    "translation": "bệnh động kinh",
+    "synonym": "seizure-disorder"
+  },
+  {
+    "word": "euthanasia",
+    "translation": "trợ tử, cái chết êm ái",
+    "synonym": "mercy-killing"
+  },
+  {
+    "word": "fracture",
+    "translation": "sự rạn, gãy xương",
+    "synonym": "break"
+  },
+  {
+    "word": "geriatrics",
+    "translation": "khoa lão khoa",
+    "synonym": "eldercare"
+  },
+  {
+    "word": "gestation",
+    "translation": "thời kỳ mang thai, thai nghén",
+    "synonym": "pregnancy"
+  },
+  {
+    "word": "glaucoma",
+    "translation": "bệnh tăng nhãn áp",
+    "synonym": "eye-pressure"
+  },
+  {
+    "word": "gynecology",
+    "translation": "khoa phụ khoa",
+    "synonym": "women-health"
+  },
+  {
+    "word": "hematology",
+    "translation": "khoa huyết học",
+    "synonym": "blood-study"
+  },
+  {
+    "word": "hemorrhage",
+    "translation": "sự xuất huyết, chảy máu nặng",
+    "synonym": "bleeding"
+  },
+  {
+    "word": "hepatitis",
+    "translation": "bệnh viêm gan",
+    "synonym": "liver-inflammation"
+  },
+  {
+    "word": "hypertension",
+    "translation": "bệnh cao huyết áp",
+    "synonym": "high-blood-pressure"
+  },
+  {
+    "word": "hypoglycemia",
+    "translation": "tình trạng hạ đường huyết",
+    "synonym": "low-sugar"
+  },
+  {
+    "word": "immunology",
+    "translation": "miễn dịch học",
+    "synonym": "immunity-science"
+  },
+  {
+    "word": "infertility",
+    "translation": "tình trạng vô sinh",
+    "synonym": "sterility"
+  },
+  {
+    "word": "inflammation",
+    "translation": "sự viêm nhiễm",
+    "synonym": "swelling"
+  },
+  {
+    "word": "inoculation",
+    "translation": "sự tiêm chủng phòng bệnh",
+    "synonym": "vaccination"
+  },
+  {
+    "word": "insomnia",
+    "translation": "chứng mất ngủ kinh niên",
+    "synonym": "sleeplessness"
+  },
+  {
+    "word": "lethargy",
+    "translation": "tình trạng uể oải, kiệt sức",
+    "synonym": "fatigue"
+  },
+  {
+    "word": "malignant",
+    "translation": "ác tính (khối u/ung thư)",
+    "synonym": "cancerous"
+  },
+  {
+    "word": "mammogram",
+    "translation": "ảnh chụp X-quang tuyến vú",
+    "synonym": "breast-scan"
+  },
+  {
+    "word": "melancholia",
+    "translation": "chứng u sầu, trầm cảm nặng",
+    "synonym": "depression"
+  },
+  {
+    "word": "metastasize",
+    "translation": "di căn (tế bào ung thư)",
+    "synonym": "spread"
+  },
+  {
+    "word": "morbidity",
+    "translation": "tỷ lệ mắc bệnh",
+    "synonym": "diseasedness"
+  },
+  {
+    "word": "mortality",
+    "translation": "tỷ lệ tử vong",
+    "synonym": "death-rate"
+  },
+  {
+    "word": "myocardial",
+    "translation": "thuộc về cơ tim",
+    "synonym": "heart-muscle"
+  },
+  {
+    "word": "narcotic",
+    "translation": "chất gây nghiện, ma túy",
+    "synonym": "opiate"
+  },
+  {
+    "word": "neoplasm",
+    "translation": "khối u tân sinh",
+    "synonym": "tumor"
+  },
+  {
+    "word": "obesity",
+    "translation": "tình trạng béo phì",
+    "synonym": "overweight"
+  },
+  {
+    "word": "pacemaker",
+    "translation": "máy tạo nhịp tim",
+    "synonym": "heart-regulator"
+  },
+  {
+    "word": "palliation",
+    "translation": "sự chăm sóc giảm nhẹ triệu chứng",
+    "synonym": "relief"
+  },
+  {
+    "word": "pandemic",
+    "translation": "đại dịch toàn cầu",
+    "synonym": "global-outbreak"
+  },
+  {
+    "word": "paralysis",
+    "translation": "sự liệt cơ, bại liệt",
+    "synonym": "palsy"
+  },
+  {
+    "word": "pharmacology",
+    "translation": "dược lý học",
+    "synonym": "drug-science"
+  },
+  {
+    "word": "physiotherapy",
+    "translation": "vật lý trị liệu",
+    "synonym": "rehab"
+  },
+  {
+    "word": "placebo",
+    "translation": "thuốc giả dược",
+    "synonym": "dummy-pill"
+  },
+  {
+    "word": "pneumonia",
+    "translation": "bệnh viêm phổi",
+    "synonym": "lung-infection"
+  },
+  {
+    "word": "prognosis",
+    "translation": "tiên lượng bệnh",
+    "synonym": "forecast"
+  },
+  {
+    "word": "psychosomatic",
+    "translation": "bệnh tâm thể (gây ra bởi tâm lý)",
+    "synonym": "mind-body"
+  },
+  {
+    "word": "quarantine",
+    "translation": "sự cách ly kiểm dịch",
+    "synonym": "isolation"
+  },
+  {
+    "word": "radiology",
+    "translation": "khoa X-quang, chẩn đoán hình ảnh",
+    "synonym": "imaging"
+  },
+  {
+    "word": "resuscitation",
+    "translation": "sự hồi sức cấp cứu",
+    "synonym": "revival"
+  },
+  {
+    "word": "rheumatism",
+    "translation": "bệnh thấp khớp",
+    "synonym": "joint-pain"
+  },
+  {
+    "word": "sanatorium",
+    "translation": "trại điều dưỡng, viện dưỡng bệnh",
+    "synonym": "clinic"
+  },
+  {
+    "word": "schizophrenia",
+    "translation": "bệnh tâm thần phân liệt",
+    "synonym": "psychosis"
+  },
+  {
+    "word": "sedative",
+    "translation": "thuốc an thần",
+    "synonym": "tranquilizer"
+  },
+  {
+    "word": "sonogram",
+    "translation": "ảnh siêu âm",
+    "synonym": "ultrasound"
+  },
+  {
+    "word": "syndrome",
+    "translation": "hội chứng bệnh",
+    "synonym": "disorder"
+  },
+  {
+    "word": "tachycardia",
+    "translation": "chứng tim đập nhanh",
+    "synonym": "fast-heartbeat"
+  },
+  {
+    "word": "therapeutics",
+    "translation": "phương pháp trị liệu học",
+    "synonym": "curative-care"
+  },
+  {
+    "word": "thrombosis",
+    "translation": "chứng huyết khối, tắc mạch",
+    "synonym": "blood-clot"
+  },
+  {
+    "word": "toxin",
+    "translation": "độc tố sinh học",
+    "synonym": "poison"
+  },
+  {
+    "word": "tuberculosis",
+    "translation": "bệnh lao phổi",
+    "synonym": "tb"
+  },
+  {
+    "word": "ventilator",
+    "translation": "máy thở y tế",
+    "synonym": "respirator"
+  },
+  {
+    "word": "virology",
+    "translation": "vi-rút học",
+    "synonym": "virus-study"
+  },
+  {
+    "word": "wellness",
+    "translation": "sự khỏe mạnh thể chất lẫn tinh thần",
+    "synonym": "wellbeing"
+  },
+  {
+    "word": "acupuncture",
+    "translation": "phương pháp châm cứu",
+    "synonym": "needling"
+  },
+  {
+    "word": "anesthesiology",
+    "translation": "khoa gây mê hồi sức",
+    "synonym": "numbing-science"
+  },
+  {
+    "word": "antibiotic",
+    "translation": "thuốc kháng sinh",
+    "synonym": "antibacterial"
+  },
+  {
+    "word": "bioethics",
+    "translation": "đạo đức sinh học y khoa",
+    "synonym": "medical-ethics"
+  },
+  {
+    "word": "bronchitis",
+    "translation": "bệnh viêm phế quản",
+    "synonym": "airway-inflammation"
+  },
+  {
+    "word": "cadaver",
+    "translation": "xác người phục vụ giải phẫu y học",
+    "synonym": "corpse"
+  },
+  {
+    "word": "cardiopulmonary",
+    "translation": "thuộc tim phổi",
+    "synonym": "heart-lung"
+  },
+  {
+    "word": "catheter",
+    "translation": "ống thông tiểu y tế",
+    "synonym": "tube"
+  },
+  {
+    "word": "chiropractic",
+    "translation": "phương pháp nắn xương khớp",
+    "synonym": "spine-adjustment"
+  },
+  {
+    "word": "coagulation",
+    "translation": "sự đông máu",
+    "synonym": "clotting"
+  },
+  {
+    "word": "congenital",
+    "translation": "bẩm sinh (tật/bệnh)",
+    "synonym": "inborn"
+  },
+  {
+    "word": "cryotherapy",
+    "translation": "liệu pháp lạnh chữa bệnh",
+    "synonym": "cold-treatment"
+  },
+  {
+    "word": "pedagogue",
+    "translation": "nhà giáo dục, nhà sư phạm khắt khe",
+    "synonym": "educator"
+  },
+  {
+    "word": "schoolmaster",
+    "translation": "hiệu trưởng trường nam sinh",
+    "synonym": "headmaster"
+  },
+  {
+    "word": "vicechancellor",
+    "translation": "phó hiệu trưởng trường đại học",
+    "synonym": "deputy-head"
+  },
+  {
+    "word": "bursar",
+    "translation": "cán bộ quản lý tài chính trường học",
+    "synonym": "treasurer"
+  },
+  {
+    "word": "registrar",
+    "translation": "cán bộ quản lý hồ sơ sinh viên",
+    "synonym": "recorder"
+  },
+  {
+    "word": "neurologist",
+    "translation": "bác sĩ chuyên khoa thần kinh",
+    "synonym": "brain-doctor"
+  },
+  {
+    "word": "optometrist",
+    "translation": "bác sĩ đo thị lực mắt",
+    "synonym": "eye-specialist"
+  },
+  {
+    "word": "orthopedist",
+    "translation": "bác sĩ chỉnh hình xương",
+    "synonym": "bone-doctor"
+  },
+  {
+    "word": "pathologist",
+    "translation": "bác sĩ chuyên khoa bệnh lý học",
+    "synonym": "disease-expert"
+  },
+  {
+    "word": "pedodontist",
+    "translation": "bác sĩ nha khoa nhi",
+    "synonym": "kids-dentist"
+  },
+  {
+    "word": "pulmonologist",
+    "translation": "bác sĩ chuyên khoa phổi",
+    "synonym": "lung-doctor"
+  },
+  {
+    "word": "rheumatologist",
+    "translation": "bác sĩ chuyên khoa thấp khớp",
+    "synonym": "joint-doctor"
+  },
+  {
+    "word": "toxicologist",
+    "translation": "chuyên gia độc chất học",
+    "synonym": "poison-expert"
+  },
+  {
+    "word": "urologist",
+    "translation": "bác sĩ chuyên khoa tiết niệu",
+    "synonym": "kidney-doctor"
+  },
+  {
+    "word": "endocrinologist",
+    "translation": "bác sĩ chuyên khoa nội tiết",
+    "synonym": "hormone-doctor"
+  },
+  {
+    "word": "gastroenterologist",
+    "translation": "bác sĩ tiêu hóa",
+    "synonym": "stomach-doctor"
+  },
+  {
+    "word": "hematologist",
+    "translation": "bác sĩ huyết học",
+    "synonym": "blood-doctor"
+  },
+  {
+    "word": "nephrologist",
+    "translation": "bác sĩ thận học",
+    "synonym": "renal-doctor"
+  },
+  {
+    "word": "oncologist",
+    "translation": "bác sĩ ung bướu",
+    "synonym": "cancer-doctor"
+  },
+  {
+    "word": "ophthalmologist",
+    "translation": "bác sĩ nhãn khoa",
+    "synonym": "eye-doctor"
+  },
+  {
+    "word": "otolaryngologist",
+    "translation": "bác sĩ tai mũi họng",
+    "synonym": "ent-doctor"
+  },
+  {
+    "word": "podiatrist",
+    "translation": "bác sĩ chuyên khoa bàn chân",
+    "synonym": "foot-doctor"
+  },
+  {
+    "word": "perianal",
+    "translation": "vùng xung quanh hậu môn",
+    "synonym": "anal-area"
+  },
+  {
+    "word": "subcutaneous",
+    "translation": "dưới da",
+    "synonym": "under-skin"
+  },
+  {
+    "word": "intravenous",
+    "translation": "tiêm truyền qua đường tĩnh mạch",
+    "synonym": "iv-injection"
+  },
+  {
+    "word": "intramuscular",
+    "translation": "tiêm bắp thịt",
+    "synonym": "muscle-injection"
+  },
+  {
+    "word": "epidural",
+    "translation": "gây tê ngoài màng cứng",
+    "synonym": "spine-numbing"
+  },
+  {
+    "word": "laparoscopy",
+    "translation": "phẫu thuật nội soi ổ bụng",
+    "synonym": "keyhole-surgery"
+  },
+  {
+    "word": "endoscopy",
+    "translation": "nội soi y tế",
+    "synonym": "scope-exam"
+  },
+  {
+    "word": "colonoscopy",
+    "translation": "nội soi đại tràng",
+    "synonym": "bowel-scope"
+  },
+  {
+    "word": "spirometry",
+    "translation": "đo dung tích chức năng phổi",
+    "synonym": "lung-test"
+  },
+  {
+    "word": "electrocardiogram",
+    "translation": "điện tâm đồ ecg",
+    "synonym": "ecg-trace"
+  },
+  {
+    "word": "electroencephalogram",
+    "translation": "điện não đồ eeg",
+    "synonym": "brain-trace"
+  },
+  {
+    "word": "pedagogy",
+    "translation": "khoa học sư phạm giảng dạy",
+    "synonym": "education-art"
+  },
+  {
+    "word": "andragogy",
+    "translation": "phương pháp giáo dục người lớn",
+    "synonym": "adult-learning"
+  },
+  {
+    "word": "heuristics",
+    "translation": "phương pháp học tập phỏng đoán",
+    "synonym": "discovery-learning"
+  },
+  {
+    "word": "socratics",
+    "translation": "phương pháp vấn đáp",
+    "synonym": "question-method"
+  },
+  {
+    "word": "formative",
+    "translation": "đánh giá quá trình (giáo dục)",
+    "synonym": "ongoing-assessment"
+  },
+  {
+    "word": "summative",
+    "translation": "đánh giá tổng kết cuối kỳ",
+    "synonym": "final-evaluation"
+  },
+  {
+    "word": "criterion",
+    "translation": "tiêu chí đánh giá",
+    "synonym": "standard"
+  },
+  {
+    "word": "benchmark",
+    "translation": "mốc chuẩn so sánh năng lực",
+    "synonym": "baseline"
+  },
+  {
+    "word": "cohort",
+    "translation": "nhóm học sinh/sinh viên cùng niên khóa",
+    "synonym": "group"
+  },
+  {
+    "word": "syllabus",
+    "translation": "đề cương chi tiết môn học",
+    "synonym": "outline"
+  }
+]
