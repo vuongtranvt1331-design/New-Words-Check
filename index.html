@@ -1,3027 +1,373 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <title>LEXICALSPACE ARCADE HUB — 8-Bit Vocabulary Console</title>
-
-  <!-- Google Fonts for 8-Bit Pixel, Western & Support -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Chakra+Petch:wght@600;700;800&family=Playfair+Display:wght@700;800;900&family=Press+Start+2P&family=Rye&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    :root {
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-    }
-
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      height: 100dvh;
-      overflow: hidden;
-      overflow-x: hidden;
-      background-color: #070510;
-      font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
-      color: #f8fafc;
-      max-width: 100vw;
-    }
-
-    .font-pixel {
-      font-family: 'Press Start 2P', 'Courier New', monospace;
-    }
-
-    /* Screen Transition Overlay */
-    #screenTransitionOverlay {
-      position: fixed;
-      inset: 0;
-      z-index: 9999;
-      background: #070510;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.22s steps(4, end);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #screenTransitionOverlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .view-screen {
-      width: 100%;
-      height: 100dvh;
-      overflow-x: hidden;
-      overflow-y: hidden;
-    }
-    .view-screen.hidden {
-      display: none !important;
-    }
-
-    /* =========================================================================
-       1. 8-BIT RETRO ARCADE HUB STYLING (#view-hub)
-       ========================================================================= */
-    #view-hub {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      background: linear-gradient(180deg, #090418 0%, #160b30 48%, #2c123d 76%, #451936 100%);
-      padding: calc(10px + var(--safe-top)) 10px calc(16px + var(--safe-bottom)) 10px;
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    #view-hub::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: repeating-linear-gradient(
-        0deg,
-        rgba(0, 0, 0, 0.18) 0px,
-        rgba(0, 0, 0, 0.18) 1px,
-        transparent 1px,
-        transparent 3px
-      );
-      pointer-events: none;
-      z-index: 25;
-    }
-
-    .pixel-scene-bg {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
-      overflow: hidden;
-    }
-
-    .pixel-star {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: #fff9db;
-      box-shadow: 0 0 6px #ffd43b;
-      animation: starBlink 1.8s steps(2, end) infinite alternate;
-    }
-
-    @keyframes starBlink {
-      0% { opacity: 0.25; transform: scale(0.8); }
-      100% { opacity: 1; transform: scale(1.2); }
-    }
-
-    .pixel-cloud {
-      position: absolute;
-      opacity: 0.35;
-      animation: cloudDrift 28s linear infinite;
-    }
-
-    @keyframes cloudDrift {
-      from { transform: translateX(-140px); }
-      to { transform: translateX(calc(100vw + 140px)); }
-    }
-
-    .hub-console-container {
-      position: relative;
-      z-index: 10;
-      width: 100%;
-      max-width: 440px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .arcade-marquee {
-      background: linear-gradient(180deg, #34134a 0%, #180929 100%);
-      border: 4px solid #ffd43b;
-      box-shadow:
-        0 0 0 4px #070510,
-        inset 0 4px 0 #70268a,
-        inset 0 -4px 0 #11051f,
-        0 6px 0 #070510;
-      padding: 12px 10px;
-      text-align: center;
-      position: relative;
-    }
-
-    .arcade-title {
-      font-family: 'Press Start 2P', monospace;
-      font-size: clamp(0.95rem, 4.5vw, 1.55rem);
-      color: #ffd43b;
-      text-shadow: 3px 3px 0 #c92a2a, -2px -2px 0 #180929;
-      letter-spacing: 1px;
-      line-height: 1.35;
-      word-break: break-word;
-    }
-
-    .arcade-subtitle {
-      font-family: 'Press Start 2P', monospace;
-      font-size: clamp(0.52rem, 2.2vw, 0.68rem);
-      color: #63e6be;
-      margin-top: 6px;
-      letter-spacing: 0.5px;
-      line-height: 1.4;
-    }
-
-    .idb-status-panel {
-      background: #111827;
-      border: 4px solid #38d9a9;
-      box-shadow: 0 0 0 3px #070510, inset 0 0 0 2px #099268;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .pixel-filter-btn {
-      font-family: 'Chakra Petch', sans-serif;
-      font-weight: 800;
-      background: #1e293b;
-      color: #f8fafc;
-      border: 3px solid #63e6be;
-      padding: 8px 10px;
-      min-height: 42px;
-      font-size: 0.78rem;
-      outline: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      transition: transform 0.08s ease, background-color 0.12s ease;
-    }
-
-    .pixel-filter-btn:active {
-      transform: translateY(2px);
-    }
-
-    .pixel-filter-btn.active {
-      background: #0ca678;
-      color: #ffffff;
-      border-color: #ffd43b;
-    }
-
-    .cartridge-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-
-    .game-cartridge {
-      background: linear-gradient(180deg, #23153c 0%, #150c25 100%);
-      border: 4px solid #f76707;
-      box-shadow:
-        0 0 0 4px #070510,
-        inset 0 4px 0 rgba(255, 255, 255, 0.14),
-        inset 0 -4px 0 rgba(0, 0, 0, 0.55),
-        0 6px 0 #070510;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 10px;
-      transition: transform 0.12s steps(2, end), border-color 0.12s ease;
-      position: relative;
-    }
-
-    .game-cartridge:hover {
-      border-color: #ffd43b;
-    }
-
-    .game-cartridge.cartridge-poker {
-      border-color: #20c997;
-    }
-    .game-cartridge.cartridge-poker:hover {
-      border-color: #ffd43b;
-    }
-
-    .cartridge-art {
-      width: 100%;
-      height: 104px;
-      background: #0b0614;
-      border: 3px solid #495057;
-      overflow: hidden;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .pixel-play-btn {
-      width: 100%;
-      min-height: 48px;
-      padding: 12px 10px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.75rem;
-      color: #180929;
-      background: #ffd43b;
-      border: 4px solid #ffffff;
-      box-shadow: inset 0 -4px 0 #e67700, 0 4px 0 #070510;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: transform 0.08s steps(2, end), filter 0.1s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .pixel-play-btn:hover:not(:disabled) {
-      filter: brightness(1.1);
-      background: #ffec99;
-    }
-
-    .pixel-play-btn:active:not(:disabled) {
-      transform: translateY(4px);
-      box-shadow: inset 0 -2px 0 #e67700, 0 0 0 #070510;
-    }
-
-    .pixel-play-btn:disabled {
-      background: #495057;
-      border-color: #868e96;
-      color: #adb5bd;
-      box-shadow: inset 0 -4px 0 #343a40, 0 4px 0 #070510;
-      cursor: not-allowed;
-    }
-
-    .hub-return-btn {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.56rem;
-      background: #212529;
-      color: #ffd43b;
-      border: 3px solid #ffd43b;
-      border-radius: 8px;
-      padding: 6px 8px;
-      min-height: 36px;
-      box-shadow: 0 3px 0 #000000;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      flex-shrink: 0;
-      transition: transform 0.08s ease;
-    }
-    .hub-return-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 1px 0 #000000;
-    }
-
-    /* Account Modal Styling */
-    #accountEditModal {
-      position: fixed;
-      inset: 0;
-      z-index: 9500;
-      background: rgba(7, 5, 16, 0.86);
-      backdrop-filter: blur(3px);
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: max(8vh, 18px) 12px 16px 12px;
-      overflow-y: auto;
-    }
-    .account-modal-box {
-      width: 100%;
-      max-width: 390px;
-      background: #140c29;
-      border: 4px solid #ffd43b;
-      box-shadow: 0 0 0 4px #070510, inset 0 0 0 3px #3b1f5e, 0 14px 32px rgba(0, 0, 0, 0.85);
-      padding: 16px 14px;
-      color: #f8fafc;
-    }
-    .account-input-field {
-      width: 100%;
-      min-height: 46px;
-      padding: 10px 12px;
-      font-family: 'Chakra Petch', sans-serif;
-      font-size: 1rem;
-      font-weight: 800;
-      color: #ffffff;
-      background: #090514;
-      border: 3px solid #63e6be;
-      outline: none;
-    }
-    .account-input-field:focus {
-      border-color: #ffd43b;
-      box-shadow: 0 0 0 3px rgba(255, 212, 59, 0.25);
-    }
-
-    /* =========================================================================
-       2. GAME 1 SCOPED STYLING: QUICK DRAWN (#view-quick-drawn)
-       ========================================================================= */
-    #view-quick-drawn {
-      --bg-outer: #2b1810;
-      --card-cream: #f8edd6;
-      --card-border-orange: #ee821a;
-      --wood-dark: #4f2711;
-      --wood-mid: #7d4218;
-      --wood-light: #9e5824;
-      --word-blue-bg: #99ccff;
-      --word-blue-border: #0e63c6;
-      --word-blue-highlight: #bbe0ff;
-      --word-navy-text: #112277;
-      --meaning-blue-text: #3863a8;
-      --btn-gold-bg: #fae078;
-      --btn-gold-border: #c56212;
-      --btn-gold-shadow: #9b4508;
-      --btn-gold-highlight: #fff3b8;
-      --btn-text-dark: #381808;
-      --danger-red: #d32f2f;
-      --success-green: #2e7d32;
-
-      background: radial-gradient(circle at center, #3d2214 0%, #1c0f08 100%);
-      font-family: 'Chakra Petch', -apple-system, BlinkMacSystemFont, sans-serif;
-      color: var(--btn-text-dark);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #view-quick-drawn .game-shell {
-      position: relative;
-      width: 100%;
-      max-width: 430px;
-      height: 100%;
-      height: 100dvh;
-      max-height: 880px;
-      padding: calc(6px + var(--safe-top)) 8px calc(6px + var(--safe-bottom)) 8px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    #view-quick-drawn .arcade-card {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      background-color: var(--card-cream);
-      border: 5px solid var(--card-border-orange);
-      border-radius: 24px;
-      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.65), inset 0 0 0 3px #fdf6e9;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      overflow: hidden;
-    }
-
-    #view-quick-drawn .top-hud {
-      position: relative;
-      z-index: 5;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 10px 4px 10px;
-      gap: 6px;
-      flex-shrink: 0;
-    }
-
-    #view-quick-drawn .wood-score-board {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: linear-gradient(180deg, #8c4b1e 0%, #6d3712 55%, #55280b 100%);
-      border: 3px solid #351605;
-      border-radius: 8px;
-      padding: 3px 10px 3px 6px;
-      min-width: 84px;
-      box-shadow: inset 0 2px 0 rgba(255, 210, 155, 0.35), inset 0 -3px 0 rgba(0, 0, 0, 0.35), 0 3px 0 rgba(0, 0, 0, 0.2);
-    }
-
-    #view-quick-drawn .bounty-chip {
-      width: 26px;
-      height: 26px;
-      flex-shrink: 0;
-      filter: drop-shadow(0 2px 0 #2b1104);
-    }
-
-    #view-quick-drawn .score-value {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.98rem;
-      color: #ffffff;
-      text-shadow: 2px 2px 0 #2b1104, -1px -1px 0 #2b1104, 1px -1px 0 #2b1104, -1px 1px 0 #2b1104;
-      letter-spacing: 1px;
-    }
-
-    #view-quick-drawn .hud-meta {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      flex: 1;
-      min-width: 0;
-    }
-
-    #view-quick-drawn .hud-q-timer {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.65rem;
-      color: #5b2c0e;
-      margin-top: 4px;
-      letter-spacing: 0.5px;
-    }
-
-    #view-quick-drawn .hud-q-timer.urgent {
-      color: var(--danger-red);
-      animation: pulseUrgent 0.35s infinite alternate;
-    }
-
-    @keyframes pulseUrgent {
-      from { transform: scale(1); }
-      to { transform: scale(1.08); }
-    }
-
-    #view-quick-drawn .hud-actions {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    #view-quick-drawn .pixel-icon-btn {
-      width: 36px;
-      height: 36px;
-      background: #f5d896;
-      border: 3px solid #47210a;
-      border-radius: 8px;
-      box-shadow: inset 0 2px 0 #fff4d2, inset 0 -3px 0 #c99a49, 0 2px 0 rgba(0,0,0,0.18);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: transform 0.08s ease;
-    }
-
-    #view-quick-drawn .pixel-icon-btn:active {
-      transform: translateY(2px);
-    }
-
-    #view-quick-drawn .pixel-icon-btn.muted {
-      background: #e0c79b;
-      opacity: 0.75;
-    }
-
-    #view-quick-drawn .duel-stage-wrapper {
-      position: relative;
-      width: 100%;
-      padding: 0 10px;
-      flex-shrink: 0;
-    }
-
-    #view-quick-drawn .duel-stage {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 7.8;
-      max-height: 165px;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    #view-quick-drawn .duel-svg {
-      width: 100%;
-      height: 100%;
-      display: block;
-      image-rendering: pixelated;
-    }
-
-    #view-quick-drawn .cowboy-player,
-    #view-quick-drawn .cowboy-enemy {
-      transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
-      transform-origin: center bottom;
-    }
-
-    #view-quick-drawn .duel-stage.state-idle .cowboy-player,
-    #view-quick-drawn .duel-stage.state-idle .cowboy-enemy {
-      animation: cowboyBreathe 1.4s ease-in-out infinite alternate;
-    }
-
-    #view-quick-drawn .duel-stage.state-urgent .cowboy-enemy {
-      animation: cowboyTwitch 0.25s ease-in-out infinite alternate;
-    }
-
-    @keyframes cowboyBreathe {
-      0% { transform: translateY(0px); }
-      100% { transform: translateY(-2px); }
-    }
-
-    @keyframes cowboyTwitch {
-      0% { transform: translateX(0px) rotate(0deg); }
-      100% { transform: translateX(-2px) rotate(-1.5deg); }
-    }
-
-    #view-quick-drawn .pose-hit,
-    #view-quick-drawn .muzzle-flash,
-    #view-quick-drawn .flying-gun,
-    #view-quick-drawn .shock-marks {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    #view-quick-drawn .duel-stage.state-player-win .enemy-pose-idle { opacity: 0; }
-    #view-quick-drawn .duel-stage.state-player-win .enemy-pose-hit,
-    #view-quick-drawn .duel-stage.state-player-win .player-muzzle,
-    #view-quick-drawn .duel-stage.state-player-win .enemy-flying-gun,
-    #view-quick-drawn .duel-stage.state-player-win .enemy-shock { opacity: 1; }
-    #view-quick-drawn .duel-stage.state-player-win .enemy-pose-hit { animation: knockbackRight 0.45s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards; }
-    #view-quick-drawn .duel-stage.state-player-win .enemy-flying-gun { animation: gunSpinLeft 0.5s ease-out forwards; }
-
-    #view-quick-drawn .duel-stage.state-enemy-win .player-pose-idle { opacity: 0; }
-    #view-quick-drawn .duel-stage.state-enemy-win .player-pose-hit,
-    #view-quick-drawn .duel-stage.state-enemy-win .enemy-muzzle,
-    #view-quick-drawn .duel-stage.state-enemy-win .player-flying-gun,
-    #view-quick-drawn .duel-stage.state-enemy-win .player-shock { opacity: 1; }
-    #view-quick-drawn .duel-stage.state-enemy-win .player-pose-hit { animation: knockbackLeft 0.45s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards; }
-    #view-quick-drawn .duel-stage.state-enemy-win .player-flying-gun { animation: gunSpinRight 0.5s ease-out forwards; }
-
-    @keyframes knockbackRight {
-      0% { transform: translate(0, 0) rotate(0deg); }
-      100% { transform: translate(12px, -10px) rotate(14deg); }
-    }
-
-    @keyframes knockbackLeft {
-      0% { transform: translate(0, 0) rotate(0deg); }
-      100% { transform: translate(-12px, -10px) rotate(-14deg); }
-    }
-
-    @keyframes gunSpinLeft {
-      0% { transform: translate(0, 0) rotate(0deg); }
-      100% { transform: translate(-18px, -16px) rotate(-38deg); }
-    }
-
-    @keyframes gunSpinRight {
-      0% { transform: translate(0, 0) rotate(0deg); }
-      100% { transform: translate(18px, -16px) rotate(38deg); }
-    }
-
-    #view-quick-drawn .fuse-bar-container {
-      position: relative;
-      width: 86%;
-      margin: 2px auto 4px auto;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
-    }
-
-    #view-quick-drawn .fuse-track {
-      position: relative;
-      width: 100%;
-      height: 15px;
-      background: repeating-linear-gradient(90deg, #3d1c0a 0px, #3d1c0a 6px, #522710 6px, #522710 12px);
-      border: 3px solid #2b1104;
-      border-radius: 9px;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.75), 0 1px 0 #f7d794;
-      overflow: hidden;
-    }
-
-    #view-quick-drawn .fuse-fill {
-      position: absolute;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      background: repeating-linear-gradient(90deg, #ff9914 0px, #ffd042 6px, #e04f00 12px);
-      border-radius: 6px;
-      transition: background 0.2s ease;
-    }
-
-    #view-quick-drawn .fuse-fill.urgent {
-      background: repeating-linear-gradient(90deg, #ff2a00 0px, #ffae00 6px, #b80000 12px);
-    }
-
-    #view-quick-drawn .fuse-knot {
-      width: 18px;
-      height: 16px;
-      margin-left: -2px;
-      flex-shrink: 0;
-    }
-
-    #view-quick-drawn .fuse-spark {
-      position: absolute;
-      top: 50%;
-      left: 100%;
-      width: 32px;
-      height: 32px;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      z-index: 4;
-      animation: sparkFlicker 0.12s infinite alternate;
-    }
-
-    @keyframes sparkFlicker {
-      0% { transform: translate(-50%, -50%) scale(0.92) rotate(-8deg); }
-      100% { transform: translate(-50%, -50%) scale(1.12) rotate(8deg); }
-    }
-
-    #view-quick-drawn .word-card-wrap {
-      padding: 2px 12px;
-      flex-shrink: 0;
-    }
-
-    #view-quick-drawn .word-card {
-      position: relative;
-      background: var(--word-blue-bg);
-      border: 4px solid var(--word-blue-border);
-      border-radius: 16px;
-      padding: 12px 12px 10px 12px;
-      text-align: center;
-      box-shadow: inset 0 4px 0 var(--word-blue-highlight), inset 0 -4px 0 #79b4f2, 0 4px 0 rgba(14, 99, 198, 0.22);
-      min-height: 90px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #view-quick-drawn .word-card::before,
-    #view-quick-drawn .word-card::after {
-      content: "";
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      border-color: #5ca2eb;
-      border-style: solid;
-      pointer-events: none;
-    }
-    #view-quick-drawn .word-card::before { top: 7px; left: 7px; border-width: 3px 0 0 3px; }
-    #view-quick-drawn .word-card::after { bottom: 7px; right: 7px; border-width: 0 3px 3px 0; }
-
-    #view-quick-drawn .target-word {
-      font-family: 'Chakra Petch', sans-serif;
-      font-weight: 800;
-      font-size: clamp(1.5rem, 6vw, 2.15rem);
-      color: var(--word-navy-text);
-      line-height: 1.1;
-      letter-spacing: 0.5px;
-      word-break: break-word;
-      text-shadow: 0 2px 0 rgba(255, 255, 255, 0.45);
-    }
-
-    #view-quick-drawn .target-meaning {
-      margin-top: 4px;
-      font-size: clamp(0.92rem, 3.6vw, 1.14rem);
-      font-weight: 700;
-      color: var(--meaning-blue-text);
-      line-height: 1.25;
-    }
-
-    #view-quick-drawn .answers-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      padding: 6px 12px;
-      flex: 1;
-      align-content: center;
-      z-index: 5;
-    }
-
-    @media (max-width: 335px) {
-      #view-quick-drawn .answers-grid { grid-template-columns: 1fr; gap: 8px; }
-    }
-
-    #view-quick-drawn .answer-btn {
-      position: relative;
-      min-height: 60px;
-      padding: 8px 8px;
-      background: var(--btn-gold-bg);
-      border: 4px solid var(--btn-gold-border);
-      border-radius: 14px;
-      box-shadow: inset 0 4px 0 var(--btn-gold-highlight), inset 0 -4px 0 #e6be4c, 0 4px 0 var(--btn-gold-shadow);
-      font-family: 'Chakra Petch', sans-serif;
-      font-size: clamp(1rem, 4.1vw, 1.28rem);
-      font-weight: 800;
-      color: var(--btn-text-dark);
-      text-align: center;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      word-break: break-word;
-      line-height: 1.15;
-      transition: transform 0.08s ease, background-color 0.15s ease, border-color 0.15s ease;
-    }
-
-    #view-quick-drawn .answer-btn:hover:not(:disabled) { background: #ffea8c; }
-    #view-quick-drawn .answer-btn:active:not(:disabled) {
-      transform: translateY(3px);
-      box-shadow: inset 0 2px 0 var(--btn-gold-highlight), 0 1px 0 var(--btn-gold-shadow);
-    }
-    #view-quick-drawn .answer-btn:disabled { cursor: default; }
-
-    #view-quick-drawn .answer-btn.correct {
-      background: #81c784 !important;
-      border-color: #1b5e20 !important;
-      color: #0d3311 !important;
-      box-shadow: inset 0 4px 0 #b9f6ca, 0 4px 0 #1b5e20 !important;
-    }
-
-    #view-quick-drawn .answer-btn.wrong {
-      background: #ef9a9a !important;
-      border-color: #b71c1c !important;
-      color: #5f0909 !important;
-      box-shadow: inset 0 4px 0 #ffcdd2, 0 4px 0 #7f0000 !important;
-    }
-
-    #view-quick-drawn .desert-footer {
-      width: 100%;
-      height: 58px;
-      flex-shrink: 0;
-      overflow: hidden;
-      pointer-events: none;
-    }
-    #view-quick-drawn .desert-footer svg { width: 100%; height: 100%; display: block; }
-
-    #view-quick-drawn .overlay-screen {
-      position: absolute;
-      inset: 0;
-      z-index: 20;
-      background: rgba(248, 237, 214, 0.97);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 12px;
-      text-align: center;
-      overflow-y: auto;
-    }
-
-    #view-quick-drawn .overlay-screen.hidden { display: none !important; }
-
-    #view-quick-drawn .wanted-poster {
-      width: 100%;
-      background: #f3dfb9;
-      border: 4px solid #7d4218;
-      border-radius: 16px;
-      padding: 14px 12px;
-      box-shadow: inset 0 0 0 2px #d9b882, 0 6px 0 rgba(79, 39, 17, 0.22);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 9px;
-      margin: auto 0;
-    }
-
-    #view-quick-drawn .game-logo-badge {
-      background: linear-gradient(180deg, #8c4b1e 0%, #55280b 100%);
-      border: 3px solid #2b1104;
-      border-radius: 12px;
-      padding: 9px 14px;
-      color: #ffd56b;
-      font-family: 'Press Start 2P', monospace;
-      font-size: clamp(0.9rem, 4vw, 1.2rem);
-      text-shadow: 2px 2px 0 #2b1104;
-      letter-spacing: 1px;
-      box-shadow: 0 4px 0 #2b1104;
-    }
-
-    #view-quick-drawn .subtitle-banner {
-      font-size: 0.8rem;
-      font-weight: 800;
-      color: #6d3712;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    #view-quick-drawn .status-box {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: 10px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      line-height: 1.35;
-      background: #e9d2a6;
-      border: 2px solid #9e6b3b;
-      color: #4a250d;
-    }
-
-    #view-quick-drawn .status-box.error {
-      background: #ffebee;
-      border-color: #c62828;
-      color: #8e0000;
-    }
-
-    #view-quick-drawn .status-box.success {
-      background: #e8f5e9;
-      border-color: #2e7d32;
-      color: #1b5e20;
-    }
-
-    #view-quick-drawn .btn-row {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      width: 100%;
-      justify-content: center;
-      margin-top: 4px;
-    }
-
-    @media (min-width: 400px) {
-      #view-quick-drawn .btn-row { flex-direction: row; flex-wrap: wrap; }
-    }
-
-    #view-quick-drawn .qd-western-btn {
-      flex: 1;
-      min-width: 110px;
-      min-height: 46px;
-      padding: 10px 12px;
-      font-family: 'Chakra Petch', sans-serif;
-      font-size: 0.92rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #2b1104;
-      background: var(--btn-gold-bg);
-      border: 3px solid var(--btn-gold-border);
-      border-radius: 12px;
-      box-shadow: inset 0 3px 0 var(--btn-gold-highlight), 0 4px 0 var(--btn-gold-shadow);
-      cursor: pointer;
-      transition: transform 0.08s ease, opacity 0.15s ease;
-    }
-
-    #view-quick-drawn .qd-western-btn.primary {
-      background: #ff9800;
-      border-color: #6d3712;
-      color: #2b1104;
-      box-shadow: inset 0 3px 0 #ffe082, 0 4px 0 #4f2711;
-    }
-
-    #view-quick-drawn .qd-western-btn.secondary {
-      background: #e6ccb2;
-      border-color: #6d3712;
-      box-shadow: inset 0 3px 0 #fff3e0, 0 4px 0 #4f2711;
-    }
-
-    #view-quick-drawn .qd-western-btn:active:not(:disabled) {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #4f2711;
-    }
-    #view-quick-drawn .qd-western-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    #view-quick-drawn .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      width: 100%;
-      margin: 4px 0;
-    }
-
-    #view-quick-drawn .stat-tile {
-      background: #fff6e0;
-      border: 2px solid #9e5824;
-      border-radius: 10px;
-      padding: 8px 6px;
-    }
-
-    #view-quick-drawn .stat-label {
-      font-size: 0.7rem;
-      font-weight: 800;
-      color: #7d4218;
-      text-transform: uppercase;
-    }
-
-    #view-quick-drawn .stat-num {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.95rem;
-      color: #2b1104;
-      margin-top: 5px;
-    }
-
-    #view-quick-drawn .feedback-banner {
-      position: absolute;
-      top: 56px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 15;
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.5px;
-      border: 3px solid #2b1104;
-      box-shadow: 0 4px 0 rgba(0,0,0,0.25);
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.15s ease;
-    }
-
-    #view-quick-drawn .feedback-banner.show { opacity: 1; }
-    #view-quick-drawn .feedback-banner.hit { background: #81c784; color: #0d3311; }
-    #view-quick-drawn .feedback-banner.miss { background: #ef5350; color: #ffffff; }
-
-    /* =========================================================================
-       3. GAME 2 SCOPED STYLING: WILD WEST VOCABULARY POKER (#view-poker)
-       ========================================================================= */
-    #view-poker {
-      --ivory: #F6EBD8;
-      --parchment: #E8D5B5;
-      --parchment-dark: #D5BC94;
-      --dark-brown: #1E110A;
-      --near-black: #110905;
-      --wood-mid: #2E1A10;
-      --antique-gold: #D4AF37;
-      --gold-bright: #F3D060;
-      --gold-dim: #9A7B2C;
-      --rust-red: #9E2A2B;
-      --rust-bright: #C83E3B;
-      --felt-green: #123C28;
-      --felt-dark: #0A2417;
-      --felt-light: #195237;
-
-      background-color: var(--near-black);
-      background-image:
-        radial-gradient(circle at 50% 30%, rgba(74, 40, 20, 0.45) 0%, rgba(15, 8, 4, 0.98) 80%),
-        repeating-linear-gradient(90deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 2px, transparent 2px, transparent 18px);
-      font-family: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
-      color: var(--ivory);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #view-poker .font-western { font-family: 'Rye', 'Playfair Display', Georgia, serif; }
-    #view-poker .font-card-word { font-family: 'Playfair Display', Georgia, serif; }
-
-    #view-poker .game-frame {
-      position: relative;
-      width: 100%;
-      max-width: 440px;
-      height: 100dvh;
-      max-height: 920px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      background: linear-gradient(180deg, #27150C 0%, #1B0E07 40%, #150B05 100%);
-      border: 3px solid var(--rust-red);
-      box-shadow: 0 0 0 1px var(--antique-gold), inset 0 0 0 2px rgba(212, 175, 55, 0.35), 0 20px 50px rgba(0, 0, 0, 0.9);
-      border-radius: 18px;
-      overflow: hidden;
-      padding: env(safe-area-inset-top, 4px) 6px env(safe-area-inset-bottom, 4px) 6px;
-    }
-
-    #view-poker .poker-table {
-      position: relative;
-      flex: 1 1 auto;
-      min-height: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      background: radial-gradient(ellipse at 50% 48%, var(--felt-light) 0%, var(--felt-green) 58%, var(--felt-dark) 100%);
-      border: 2px solid var(--antique-gold);
-      border-radius: 14px;
-      box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.75), inset 0 0 0 2px rgba(158, 42, 43, 0.45), 0 4px 12px rgba(0, 0, 0, 0.5);
-      padding: 6px 8px;
-      margin: 3px 2px;
-      overflow: hidden;
-    }
-
-    #view-poker .poker-table::before {
-      content: "";
-      position: absolute;
-      inset: 4px;
-      border: 1px dashed rgba(212, 175, 55, 0.28);
-      border-radius: 10px;
-      pointer-events: none;
-      z-index: 1;
-    }
-
-    #view-poker .cards-grid {
-      position: relative;
-      z-index: 2;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-template-rows: repeat(2, minmax(0, 1fr));
-      gap: 7px;
-      flex: 1 1 0;
-      min-height: 0;
-      width: 100%;
-    }
-
-    #view-poker .card-slot { position: relative; width: 100%; height: 100%; min-height: 68px; perspective: 900px; }
-
-    #view-poker .playing-card {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      border-radius: 12px;
-      transform-style: preserve-3d;
-      transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, filter 0.25s ease;
-      cursor: pointer;
-      will-change: transform;
-    }
-    #view-poker .playing-card.is-flipped { transform: rotateY(180deg); }
-    #view-poker .playing-card.opponent-card { cursor: default; }
-
-    #view-poker .card-face {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border-radius: 12px;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    #view-poker .card-front {
-      background: radial-gradient(circle at 50% 50%, #FFF9EE 0%, var(--ivory) 65%, var(--parchment) 100%);
-      border: 2px solid #2A160B;
-      box-shadow: inset 0 0 0 2px var(--antique-gold), inset 0 0 0 4px #FDF6E7, inset 0 0 0 5px rgba(154, 123, 44, 0.65), 0 4px 10px rgba(0, 0, 0, 0.55);
-      padding: 16px 10px;
-      color: var(--dark-brown);
-    }
-    #view-poker .card-front::before {
-      content: ""; position: absolute; inset: 7px; border: 1px solid rgba(158, 42, 43, 0.22); border-radius: 6px; pointer-events: none;
-    }
-
-    #view-poker .card-back {
-      transform: rotateY(180deg);
-      background: radial-gradient(circle at 50% 50%, #6E1D1D 0%, #3E120C 62%, #220A06 100%);
-      border: 2px solid #2A160B;
-      box-shadow: inset 0 0 0 2px var(--antique-gold), inset 0 0 0 4px #2B0D08, inset 0 0 0 5.5px rgba(212, 175, 55, 0.75), 0 4px 10px rgba(0, 0, 0, 0.6);
-    }
-    #view-poker .card-back::before {
-      content: ""; position: absolute; inset: 7px; border: 1px solid rgba(246, 235, 216, 0.35); border-radius: 6px;
-      background-image: radial-gradient(rgba(212, 175, 55, 0.16) 1px, transparent 1px); background-size: 8px 8px; pointer-events: none;
-    }
-
-    #view-poker .card-corner {
-      position: absolute; display: flex; flex-direction: column; align-items: center; line-height: 0.92;
-      font-weight: 800; font-size: clamp(0.62rem, 1.9vw, 0.76rem); letter-spacing: -0.02em; pointer-events: none; z-index: 3;
-    }
-    #view-poker .card-corner.top-left { top: 7px; left: 8px; }
-    #view-poker .card-corner.bottom-right { bottom: 7px; right: 8px; transform: rotate(180deg); }
-    #view-poker .suit-red { color: var(--rust-red); }
-    #view-poker .suit-black { color: #23120B; }
-
-    #view-poker .corner-ornament { position: absolute; width: 6px; height: 6px; border: 1px solid rgba(154, 123, 44, 0.65); transform: rotate(45deg); pointer-events: none; }
-    #view-poker .corner-ornament.tr { top: 9px; right: 9px; }
-    #view-poker .corner-ornament.bl { bottom: 9px; left: 9px; }
-
-    #view-poker .playing-card.active-target { transform: translateY(-2px) scale(1.02); }
-    #view-poker .playing-card.active-target .card-front {
-      border-color: var(--gold-bright);
-      box-shadow: 0 0 0 2px var(--gold-bright), 0 0 16px rgba(243, 208, 96, 0.85), inset 0 0 0 2px var(--antique-gold), inset 0 0 12px rgba(212, 175, 55, 0.35);
-      animation: pulseTargetGold 1.5s infinite ease-in-out;
-    }
-
-    @keyframes pulseTargetGold {
-      0%, 100% { box-shadow: 0 0 0 2px var(--gold-bright), 0 0 12px rgba(243, 208, 96, 0.7), inset 0 0 0 2px var(--antique-gold); }
-      50% { box-shadow: 0 0 0 3px #FFF2A6, 0 0 22px rgba(243, 208, 96, 1), inset 0 0 0 2px var(--antique-gold); }
-    }
-
-    #view-poker .playing-card.correct-flash .card-front {
-      border-color: var(--gold-bright) !important; background: radial-gradient(circle, #FFF8CC 0%, #F5DF8B 100%) !important;
-      box-shadow: 0 0 24px rgba(243, 208, 96, 1), inset 0 0 0 3px var(--antique-gold) !important;
-    }
-
-    #view-poker .playing-card.wrong-flash { animation: cardWrongRecoil 0.55s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; z-index: 20; }
-    #view-poker .playing-card.wrong-flash .card-front {
-      border-color: var(--rust-bright) !important; background: radial-gradient(circle, #FFD6D6 0%, #F2A7A7 100%) !important;
-      box-shadow: 0 0 24px rgba(200, 62, 59, 0.95), inset 0 0 0 3px var(--rust-red) !important;
-    }
-
-    @keyframes cardWrongRecoil {
-      0% { transform: scale(1); }
-      15% { transform: translate(-7px, -4px) rotate(-4deg) scale(1.04); }
-      30% { transform: translate(7px, 3px) rotate(4deg) scale(1.02); }
-      45% { transform: translate(-5px, 2px) rotate(-2.5deg); }
-      60% { transform: translate(4px, -2px) rotate(2deg); }
-      80% { transform: translate(-2px, 1px) rotate(-1deg); }
-      100% { transform: translate(0, 0) rotate(0deg) scale(1); }
-    }
-
-    #view-poker .playing-card.student-selectable:active { transform: scale(0.96); }
-
-    #view-poker .playing-card.dealing-start { opacity: 0; transform: translateY(-90px) scale(0.45) rotate(-14deg); pointer-events: none; }
-    #view-poker .playing-card.dealing-animate { animation: dealCardIn 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.05) forwards; }
-    @keyframes dealCardIn {
-      0% { opacity: 0; transform: translateY(-90px) scale(0.45) rotate(-14deg); }
-      75% { opacity: 1; transform: translateY(3px) scale(1.02) rotate(1.5deg); }
-      100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
-    }
-
-    #view-poker .screen-shake { animation: westernShake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
-    @keyframes westernShake {
-      0%, 100% { transform: translate(0, 0); }
-      15% { transform: translate(-6px, 4px) rotate(-0.6deg); }
-      30% { transform: translate(6px, -5px) rotate(0.6deg); }
-      45% { transform: translate(-5px, -3px) rotate(-0.4deg); }
-      60% { transform: translate(4px, 4px) rotate(0.3deg); }
-      75% { transform: translate(-3px, 2px); }
-    }
-
-    #view-poker .chip-token { transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease; }
-    #view-poker .chip-token.chip-gain-anim { animation: chipPopIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-    #view-poker .chip-token.chip-loss-anim { animation: chipFlyOut 0.55s ease-in forwards; }
-    @keyframes chipPopIn {
-      0% { transform: translateY(-22px) scale(0.2); opacity: 0; }
-      70% { transform: translateY(2px) scale(1.22); opacity: 1; }
-      100% { transform: translateY(0) scale(1); opacity: 1; }
-    }
-    @keyframes chipFlyOut {
-      0% { transform: translateY(0) scale(1); opacity: 1; }
-      100% { transform: translateY(24px) scale(0.2) rotate(25deg); opacity: 0.15; }
-    }
-
-    #view-poker .card-word-text { font-weight: 800; color: #1B0D06; text-align: center; line-height: 1.08; word-break: break-word; hyphens: auto; max-width: 92%; z-index: 2; }
-    #view-poker .card-vi-text { font-weight: 600; color: #5C341E; text-align: center; line-height: 1.15; margin-top: 3px; max-width: 94%; z-index: 2; }
-    #view-poker .card-synonym-text { font-family: 'Playfair Display', Georgia, serif; font-weight: 800; color: #1B0D06; text-align: center; line-height: 1.12; word-break: break-word; hyphens: auto; max-width: 92%; z-index: 2; }
-
-    #view-poker .western-btn {
-      background: linear-gradient(180deg, #4A2816 0%, #2B160B 100%);
-      border: 1.5px solid var(--antique-gold); color: var(--ivory);
-      box-shadow: 0 2px 0 #140904, inset 0 1px 0 rgba(255, 255, 255, 0.15); transition: transform 0.12s ease, filter 0.15s ease;
-    }
-    #view-poker .western-btn:hover { filter: brightness(1.12); }
-    #view-poker .western-btn:active { transform: translateY(1px); }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101820">
+<title>LexicalSpace — Loading...</title>
+
+<style>
+:root {
+  --bg: #101820;
+  --panel: #182b32;
+  --green: #a8ff60;
+  --cyan: #64f5e5;
+  --white: #e8ffe5;
+  --muted: #75918b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--green);
+  font-family: "Courier New", monospace;
+  image-rendering: pixelated;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    transparent 0px,
+    transparent 3px,
+    #00000025 4px
+  );
+  z-index: 5;
+}
+
+.screen {
+  width: min(100%, 520px);
+  padding: 28px 22px;
+  border: 3px solid var(--green);
+  background: var(--panel);
+  box-shadow: 8px 8px 0 #0008, 0 0 35px #a8ff6018;
+  text-align: center;
+  position: relative;
+}
+
+.logo {
+  font-size: clamp(25px, 7vw, 39px);
+  font-weight: 900;
+  letter-spacing: -2px;
+  text-shadow: 3px 3px #426c37;
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--cyan);
+  font-size: 11px;
+  letter-spacing: 3px;
+  margin-top: 9px;
+}
+
+.divider {
+  border: 0;
+  border-top: 2px dashed #49665b;
+  margin: 24px 0;
+}
+
+.scene {
+  height: 132px;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 4px solid var(--green);
+  background:
+    linear-gradient(#182b32dd, #182b32dd),
+    repeating-linear-gradient(90deg, #254139 0 2px, transparent 2px 16px);
+}
+
+.star {
+  position: absolute;
+  color: var(--white);
+  animation: blink 1s steps(2, end) infinite;
+}
+
+.star:nth-child(1) { top: 15px; left: 12%; }
+.star:nth-child(2) { top: 34px; left: 76%; animation-delay: .4s; }
+.star:nth-child(3) { top: 12px; left: 49%; animation-delay: .7s; }
+
+.mountain {
+  position: absolute;
+  bottom: 0;
+  width: 100px;
+  height: 64px;
+  background: #285448;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.mountain.one { left: 5%; }
+.mountain.two {
+  left: 52%;
+  width: 125px;
+  height: 83px;
+  background: #203f39;
+}
+
+.runner {
+  position: absolute;
+  bottom: 0;
+  left: 8%;
+  width: 32px;
+  height: 48px;
+  animation: run 1.1s steps(8, end) infinite alternate;
+}
+
+.runner svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  image-rendering: pixelated;
+}
+
+.ground {
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 200%;
+  height: 9px;
+  background: repeating-linear-gradient(
+    90deg, var(--green) 0 12px, transparent 12px 24px
+  );
+  animation: ground 1s linear infinite;
+}
+
+.status {
+  margin: 22px 0 12px;
+  color: var(--white);
+  font-size: 13px;
+  min-height: 18px;
+}
+
+.bar {
+  height: 20px;
+  padding: 3px;
+  border: 2px solid var(--green);
+  background: #0c171b;
+}
+
+.fill {
+  height: 100%;
+  width: 0%;
+  background: var(--green);
+  box-shadow: 0 0 12px #a8ff6055;
+  transition: width .08s linear;
+}
+
+.progress-row {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--cyan);
+}
+
+.message {
+  margin-top: 25px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+.destination {
+  color: var(--white);
+  overflow-wrap: anywhere;
+}
+
+.blink {
+  animation: blink .8s steps(2, end) infinite;
+}
+
+.manual {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 14px;
+  color: var(--bg);
+  background: var(--green);
+  font-size: 12px;
+  font-weight: bold;
+  text-decoration: none;
+  border: 2px solid var(--green);
+  box-shadow: 4px 4px 0 #0008;
+}
+
+.manual:hover,
+.manual:focus-visible {
+  color: var(--green);
+  background: var(--panel);
+  outline: 2px solid var(--cyan);
+  outline-offset: 3px;
+}
+
+.footer {
+  margin-top: 24px;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: .25; }
+}
+
+@keyframes run {
+  from { transform: translateX(0) translateY(0); }
+  to { transform: translateX(95px) translateY(-5px); }
+}
+
+@keyframes ground {
+  from { transform: translateX(0); }
+  to { transform: translateX(-24px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 2s !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .screen { padding: 22px 14px; }
+  .subtitle { letter-spacing: 1px; }
+}
+</style>
 </head>
+
 <body>
+<main class="screen">
+  <h1 class="logo">LEXICALSPACE<span class="blink">_</span></h1>
+  <div class="subtitle">◆ SYSTEM UPDATE ◆</div>
 
-  <!-- RETRO CRT CURTAIN TRANSITION -->
-  <div id="screenTransitionOverlay">
-    <span class="font-pixel text-xs sm:text-sm text-[#ffd43b] tracking-widest">LOADING CARTRIDGE...</span>
-  </div>
+  <hr class="divider">
 
-  <!-- ACCOUNT SWITCH / EDIT MODAL -->
-  <div id="accountEditModal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="accountModalTitle">
-    <div class="account-modal-box">
-      <div class="flex items-center justify-between border-b-2 border-[#3b1f5e] pb-2.5 mb-3">
-        <h3 id="accountModalTitle" class="font-pixel text-[11px] sm:text-xs text-[#ffd43b] tracking-wide">
-          SWITCH ACCOUNT
-        </h3>
-        <button id="btnCloseAccountModal" type="button" class="w-8 h-8 bg-[#212529] border-2 border-[#ffd43b] text-[#ffd43b] font-pixel text-xs flex items-center justify-center cursor-pointer active:translate-y-0.5" aria-label="Close">
-          ✕
-        </button>
-      </div>
+  <div class="scene" aria-hidden="true">
+    <span class="star">✦</span>
+    <span class="star">✧</span>
+    <span class="star">✦</span>
 
-      <form id="accountEditForm" class="space-y-3" novalidate>
-        <div>
-          <label for="accountNameInput" class="block text-xs font-extrabold uppercase tracking-wider text-[#63e6be] mb-1.5">
-            Student Account Name:
-          </label>
-          <input
-            id="accountNameInput"
-            type="text"
-            class="account-input-field"
-            placeholder="Enter account name (e.g. Alex, Linh)..."
-            autocomplete="off"
-            autocapitalize="words"
-            spellcheck="false"
-          />
-        </div>
+    <div class="mountain one"></div>
+    <div class="mountain two"></div>
 
-        <div id="accountModalError" class="hidden p-2.5 bg-rose-950 border-2 border-rose-400 text-rose-100 text-xs font-bold leading-snug">
-          Please enter a valid account name.
-        </div>
-
-        <p class="text-[11px] text-slate-300 leading-relaxed bg-[#0d071c] p-2 border border-slate-700/80">
-          Updates your active student. We will try to fetch vocabulary from <strong>LexicalSpace IndexedDB</strong> first. If unavailable, we will automatically fallback to <strong>Firebase</strong> or <strong>ArcadeSpace Cache</strong>.
-        </p>
-
-        <div class="grid grid-cols-2 gap-2.5 pt-1">
-          <button id="btnCancelAccountEdit" type="button" class="pixel-filter-btn w-full justify-center border-slate-400 text-slate-200">
-            Cancel
-          </button>
-          <button id="btnConfirmAccountEdit" type="submit" class="pixel-filter-btn w-full justify-center bg-[#ffd43b] text-[#180929] border-white font-extrabold">
-            ✓ Confirm
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- VIEW 0: 8-BIT RETRO ARCADE GAME HUB MENU -->
-  <section id="view-hub" class="view-screen">
-    <!-- 8-Bit Background -->
-    <div class="pixel-scene-bg" aria-hidden="true">
-      <div class="pixel-star" style="top: 8%; left: 12%; animation-delay: 0.1s;"></div>
-      <div class="pixel-star" style="top: 15%; left: 28%; animation-delay: 0.7s;"></div>
-      <div class="pixel-star" style="top: 6%; left: 52%; animation-delay: 0.3s;"></div>
-      <div class="pixel-star" style="top: 19%; left: 74%; animation-delay: 1.1s;"></div>
-      <div class="pixel-star" style="top: 11%; left: 89%; animation-delay: 0.5s;"></div>
-      <div class="pixel-star" style="top: 27%; left: 18%; animation-delay: 1.4s;"></div>
-      <div class="pixel-star" style="top: 24%; left: 63%; animation-delay: 0.9s;"></div>
-      <svg class="pixel-cloud" style="top: 12%; width: 110px; height: 40px;" viewBox="0 0 44 16"><path d="M12 4h16v4h8v4h4v4H4v-4h4V8h4V4z" fill="#e599f7"/></svg>
-      <svg class="pixel-cloud" style="top: 22%; width: 90px; height: 32px; animation-delay: -14s;" viewBox="0 0 44 16"><path d="M12 4h16v4h8v4h4v4H4v-4h4V8h4V4z" fill="#f783ac"/></svg>
-      <svg class="absolute bottom-0 left-0 w-full h-36 sm:h-48" viewBox="0 0 360 90" preserveAspectRatio="none">
-        <polygon points="0,90 0,58 24,58 36,34 68,34 80,62 128,62 146,26 184,26 200,56 244,56 264,38 302,38 318,60 360,60 360,90" fill="#1d0b26"/>
-        <polygon points="0,90 0,72 52,72 64,48 96,48 108,70 176,70 192,44 226,44 240,72 360,72 360,90" fill="#120617"/>
-        <rect x="0" y="76" width="360" height="14" fill="#070510"/>
-        <g fill="#2b8a3e">
-          <rect x="42" y="54" width="4" height="22"/><rect x="36" y="60" width="6" height="3"/><rect x="36" y="56" width="3" height="7"/><rect x="46" y="62" width="6" height="3"/><rect x="49" y="57" width="3" height="8"/>
-          <rect x="310" y="52" width="4" height="24"/><rect x="304" y="58" width="6" height="3"/><rect x="304" y="54" width="3" height="7"/><rect x="314" y="60" width="6" height="3"/><rect x="317" y="55" width="3" height="8"/>
-        </g>
+    <div class="runner">
+      <svg viewBox="0 0 16 24"
+           shape-rendering="crispEdges"
+           xmlns="http://www.w3.org/2000/svg">
+        <!-- Pixel adventurer -->
+        <rect x="5" y="1" width="6" height="6" fill="#a8ff60"/>
+        <rect x="4" y="3" width="2" height="2" fill="#e8ffe5"/>
+        <rect x="6" y="3" width="1" height="1" fill="#101820"/>
+        <rect x="10" y="3" width="1" height="1" fill="#101820"/>
+        <rect x="5" y="7" width="6" height="2" fill="#64f5e5"/>
+        <rect x="3" y="9" width="10" height="7" fill="#64f5e5"/>
+        <rect x="1" y="10" width="3" height="5" fill="#a8ff60"/>
+        <rect x="12" y="10" width="3" height="4" fill="#a8ff60"/>
+        <rect x="4" y="16" width="3" height="5" fill="#a8ff60"/>
+        <rect x="9" y="16" width="3" height="5" fill="#a8ff60"/>
+        <rect x="2" y="21" width="5" height="2" fill="#e8ffe5"/>
+        <rect x="9" y="21" width="5" height="2" fill="#e8ffe5"/>
       </svg>
     </div>
 
-    <div class="hub-console-container">
-      <header class="arcade-marquee">
-        <div class="flex items-center justify-between gap-2 mb-1.5">
-          <span class="font-pixel text-[9px] text-[#ff922b] uppercase">1UP · SALOON EDITION</span>
-          <button id="hubSoundBtn" type="button" class="font-pixel text-[9px] px-2.5 py-1.5 bg-[#212529] text-[#ffd43b] border-2 border-[#ffd43b] cursor-pointer active:translate-y-0.5">
-            SFX: ON
-          </button>
-        </div>
-        <h1 class="arcade-title">LEXICALSPACE ARCADE</h1>
-        <p class="arcade-subtitle">★ 8-BIT VOCABULARY GAME CONSOLE ★</p>
-      </header>
+    <div class="ground"></div>
+  </div>
 
-      <section class="idb-status-panel" aria-label="LexicalSpace Data Status">
-        <!-- Row 1: Source Status Indicator + Switch Account Button -->
-        <div class="flex items-center justify-between gap-2 border-b border-slate-700/80 pb-2">
-          <div class="flex items-center gap-2 min-w-0">
-            <span id="idbStatusDot" class="inline-block w-3 h-3 shrink-0 bg-amber-400 border border-black shadow-[0_0_6px_#fbbf24]"></span>
-            <span id="idbStatusText" class="font-pixel text-[9px] sm:text-[10px] text-[#63e6be] truncate uppercase">SRC: LOADING...</span>
-          </div>
-          <button id="hubSwitchAccountBtn" type="button" class="pixel-filter-btn shrink-0 px-3 py-1 text-xs bg-[#ffd43b] text-[#180929] border-white font-extrabold" title="Switch Student Account">
-            Switch Account
-          </button>
-        </div>
+  <div class="status" id="status" aria-live="polite">
+    INITIALIZING NEW WORLD...
+  </div>
 
-        <!-- Row 2: Account Info -->
-        <div>
-          <span class="block text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">
-            Active Student Account:
-          </span>
-          <div class="w-full text-center py-2 px-3 bg-[#090514] border border-[#63e6be] rounded text-[#f8fafc] font-bold">
-            <span id="hubActiveStudentText" class="text-sm">---</span>
-          </div>
-        </div>
+  <div class="bar" role="progressbar"
+       aria-label="Redirect progress"
+       aria-valuemin="0" aria-valuemax="100"
+       aria-valuenow="0" id="progressbar">
+    <div class="fill" id="fill"></div>
+  </div>
 
-        <!-- Row 3: Word Counts Grid -->
-        <div class="grid grid-cols-3 gap-1.5 text-center">
-          <div class="p-1.5 bg-slate-900 border border-slate-700">
-            <span class="block text-[10px] font-bold text-slate-400 uppercase">Total Words</span>
-            <strong id="hubStatTotalWords" class="text-sm font-extrabold text-[#ffd43b]">0</strong>
-          </div>
-          <div class="p-1.5 bg-slate-900 border border-slate-700">
-            <span class="block text-[10px] font-bold text-slate-400 uppercase">Student</span>
-            <strong id="hubStatStudentWords" class="text-sm font-extrabold text-[#63e6be]">0</strong>
-          </div>
-          <div class="p-1.5 bg-slate-900 border border-slate-700">
-            <span class="block text-[10px] font-bold text-slate-400 uppercase">Playable</span>
-            <strong id="hubStatPlayableWords" class="text-sm font-extrabold text-[#ff922b]">0</strong>
-          </div>
-        </div>
+  <div class="progress-row">
+    <span id="stage">LOADING ASSETS</span>
+    <span id="percent">0%</span>
+  </div>
 
-        <!-- Dynamic Alert Banner -->
-        <div id="hubIdbNotice" class="hidden p-2.5 bg-rose-950/90 border-2 border-rose-400 text-rose-100 text-xs font-semibold leading-relaxed"></div>
-      </section>
+  <div class="message">
+    MIGRATING TO NEW SERVER...<br>
+    <span class="destination">
+      vuongtranvt1331-design.github.io
+    </span>
+    <br>
+    <span class="blink">PLEASE WAIT, PLAYER 1</span>
+  </div>
 
-      <!-- Cartridges -->
-      <section class="cartridge-grid" aria-label="Select a Vocabulary Game">
-        <!-- QUICK DRAWN -->
-        <article class="game-cartridge">
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="font-pixel text-[9px] px-2 py-0.5 bg-[#c92a2a] text-white border border-white">CARTRIDGE #01</span>
-              <span class="font-pixel text-[9px] text-[#ffd43b]">SPEED DUEL</span>
-            </div>
-            <div class="cartridge-art">
-              <svg viewBox="0 0 240 100" class="w-full h-full" style="image-rendering: pixelated;">
-                <rect width="240" height="100" fill="#f8edd6"/>
-                <polygon points="0,75 25,42 50,42 68,75" fill="#e5b383"/>
-                <polygon points="160,75 185,38 215,38 240,75" fill="#e5b383"/>
-                <rect x="0" y="72" width="240" height="28" fill="#f2d29b"/>
-                <rect x="42" y="34" width="22" height="6" fill="#7d4420"/>
-                <text x="120" y="56" text-anchor="middle" fill="#c92a2a" font-family="'Press Start 2P', monospace" font-size="11">VS</text>
-                <rect x="176" y="34" width="22" height="6" fill="#262322"/>
-              </svg>
-            </div>
-            <h2 class="font-pixel text-sm sm:text-base text-[#ffd43b] mt-2.5">QUICK DRAWN</h2>
-            <p class="text-xs text-slate-300 mt-1 leading-relaxed">
-              Reflex 4-option synonym shootout! Beat the burning fuse timer (+1 pt hit, -3 pts miss). Reach <strong>20 pts</strong> before dropping to 0.
-            </p>
-          </div>
-          <button id="btnLaunchQuickDrawn" type="button" class="pixel-play-btn" disabled>
-            <span>▶ PLAY QUICK DRAWN</span>
-          </button>
-        </article>
+  <a class="manual"
+     href="https://vuongtranvt1331-design.github.io/Lexical_Space/">
+     ▶ ENTER LEXICALSPACE
+  </a>
 
-        <!-- VOCAB POKER -->
-        <article class="game-cartridge cartridge-poker">
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <span class="font-pixel text-[9px] px-2 py-0.5 bg-[#0ca678] text-white border border-white">CARTRIDGE #02</span>
-              <span class="font-pixel text-[9px] text-[#63e6be]">CARD MATCH</span>
-            </div>
-            <div class="cartridge-art">
-              <svg viewBox="0 0 240 100" class="w-full h-full" style="image-rendering: pixelated;">
-                <rect width="240" height="100" fill="#123C28"/>
-                <rect x="38" y="18" width="44" height="64" rx="4" fill="#F6EBD8" stroke="#1E110A" stroke-width="2"/>
-                <text x="45" y="31" fill="#9E2A2B" font-weight="bold" font-size="10">A♦</text>
-                <rect x="98" y="18" width="44" height="64" rx="4" fill="#521612" stroke="#D4AF37" stroke-width="2"/>
-                <rect x="158" y="18" width="44" height="64" rx="4" fill="#F6EBD8" stroke="#1E110A" stroke-width="2"/>
-                <text x="165" y="31" fill="#1E110A" font-weight="bold" font-size="10">K♠</text>
-              </svg>
-            </div>
-            <h2 class="font-pixel text-sm sm:text-base text-[#63e6be] mt-2.5">VOCAB POKER</h2>
-            <p class="text-xs text-slate-300 mt-1 leading-relaxed">
-              Saloon 4v4 card showdown! Match the Outlaw's target English & Vietnamese cards with your synonym hand to stack <strong>10 Poker Chips</strong>.
-            </p>
-          </div>
-          <button id="btnLaunchPoker" type="button" class="pixel-play-btn" disabled>
-            <span>▶ PLAY VOCAB POKER</span>
-          </button>
-        </article>
-      </section>
+  <div class="footer">LEXICALSPACE © NEW LEVEL UNLOCKED</div>
+</main>
 
-      <footer class="text-center py-1">
-        <p class="font-pixel text-[8px] sm:text-[9px] text-slate-400 tracking-wider leading-relaxed">
-          INSERT COIN · DUAL DB ENGINE
-        </p>
-      </footer>
-    </div>
-  </section>
+<script>
+(() => {
+  const destination =
+    "https://vuongtranvt1331-design.github.io/Lexical_Space/";
 
-  <!-- VIEW 1: QUICK DRAWN -->
-  <section id="view-quick-drawn" class="view-screen hidden">
-    <main class="game-shell">
-      <div class="arcade-card">
-        <header class="top-hud">
-          <button id="qdBtnBackHub" type="button" class="hub-return-btn">◀ HUB</button>
-          <div class="wood-score-board">
-            <span id="hudScore" class="score-value">10</span>
-          </div>
-          <div class="hud-meta"><div id="hudTimerText" class="hud-q-timer">Q1 • 10.0s</div></div>
-          <div class="hud-actions">
-            <button id="btnAudioToggle" class="pixel-icon-btn" type="button">
-              <svg id="svgSpeakerOn" width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9v6h4l5 5V4L7 9H3z" fill="#3b1a08"/><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z" fill="#3b1a08"/></svg>
-              <svg id="svgSpeakerOff" width="20" height="20" viewBox="0 0 24 24" fill="none" style="display:none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71z" fill="#7f1d1d"/></svg>
-            </button>
-          </div>
-        </header>
-        <div id="feedbackBanner" class="feedback-banner">QUICK DRAW!</div>
-        <section class="duel-stage-wrapper">
-          <div id="duelStage" class="duel-stage state-idle">
-             <svg class="duel-svg" viewBox="0 0 360 170" xmlns="http://www.w3.org/2000/svg">
-              <rect width="360" height="170" fill="#f8edd6"/>
-              <rect x="0" y="120" width="360" height="50" fill="#f2d29b"/>
-              <ellipse cx="82" cy="146" rx="34" ry="6" fill="#d9b273"/>
-              <ellipse cx="278" cy="146" rx="34" ry="6" fill="#d9b273"/>
-              <g class="cowboy-player"><g class="player-pose-idle"><path d="M52,145 h16 v-8 h-10 v4 h-6 z" fill="#5c2c12"/><path d="M98,145 h18 v-5 h-6 v-3 h-12 z" fill="#5c2c12"/><path d="M58,137 L74,108 L90,108 L108,137 L96,137 L82,118 L70,137 Z" fill="#21568a"/><rect x="74" y="55" width="17" height="18" fill="#f4b384"/></g><g class="pose-hit player-pose-hit"><path d="M52,118 L70,96 L88,100 L96,130 L84,132 L78,110 L62,124 Z" fill="#21568a"/></g><g class="flying-gun player-flying-gun"><rect x="115" y="45" width="15" height="5" fill="#495057"/></g></g>
-              <g class="cowboy-enemy"><g class="enemy-pose-idle"><path d="M308,145 h-16 v-8 h10 v4 h6 z" fill="#4a220d"/><path d="M262,145 h-18 v-5 h6 v-3 h12 z" fill="#4a220d"/><path d="M302,137 L286,108 L270,108 L252,137 L264,137 L278,118 L290,137 Z" fill="#1d4e78"/><rect x="269" y="55" width="17" height="18" fill="#f4b384"/></g><g class="pose-hit enemy-pose-hit"><path d="M254,114 L272,94 L290,98 L302,128 L290,130 L282,108 L264,120 Z" fill="#1d4e78"/></g><g class="flying-gun enemy-flying-gun"><rect x="228" y="44" width="15" height="5" fill="#495057"/></g></g>
-            </svg>
-          </div>
-        </section>
-        <div class="fuse-bar-container">
-          <div class="fuse-track"><div id="fuseFill" class="fuse-fill"></div></div>
-          <svg class="fuse-knot" viewBox="0 0 20 18"><rect x="0" y="5" width="7" height="8" fill="#c92a2a"/></svg>
-          <svg id="fuseSpark" class="fuse-spark" viewBox="0 0 40 40"><circle cx="20" cy="20" r="5" fill="#ffffff"/></svg>
-        </div>
-        <section class="word-card-wrap"><div class="word-card"><div id="targetWordText" class="target-word">---</div><div id="targetMeaningText" class="target-meaning">(---)</div></div></section>
-        <section id="answersGrid" class="answers-grid">
-          <button type="button" class="answer-btn" data-index="0">---</button><button type="button" class="answer-btn" data-index="1">---</button><button type="button" class="answer-btn" data-index="2">---</button><button type="button" class="answer-btn" data-index="3">---</button>
-        </section>
-        <footer class="desert-footer">
-          <svg viewBox="0 0 360 65" preserveAspectRatio="none"><rect width="360" height="65" fill="#f8edd6"/><polygon points="0,50 45,35 72,18 96,18 112,46 188,44 205,12 242,12 258,42 280,26 296,26 312,46 360,42 360,52 0,52" fill="#e5b383"/></svg>
-        </footer>
+  const fill = document.getElementById("fill");
+  const percent = document.getElementById("percent");
+  const status = document.getElementById("status");
+  const stage = document.getElementById("stage");
+  const bar = document.getElementById("progressbar");
 
-        <section id="errorScreen" class="overlay-screen hidden">
-          <div class="wanted-poster">
-            <div class="game-logo-badge">QUICK DRAWN</div>
-            <div class="subtitle-banner">Error Loading Vocabulary</div>
-            <div id="qdVocabStatusBox" class="status-box error"></div>
-            <div class="btn-row"><button id="qdErrorBackHubBtn" type="button" class="qd-western-btn secondary">◀ 8-Bit Hub</button></div>
-          </div>
-        </section>
-        <section id="resultScreen" class="overlay-screen hidden">
-          <div class="wanted-poster">
-            <div id="resultTitleBadge" class="game-logo-badge">DUEL OVER</div>
-            <div id="resultSubtitle" class="subtitle-banner">Outdrawn in the dust!</div>
-            <div class="stats-grid"><div class="stat-tile"><div class="stat-label">Final Score</div><div id="statFinalScore" class="stat-num">0</div></div><div class="stat-tile"><div class="stat-label">Best Score</div><div id="statBestScore" class="stat-num">0</div></div><div class="stat-tile"><div class="stat-label">Attempted</div><div id="statAttempted" class="stat-num">0</div></div><div class="stat-tile"><div class="stat-label">Correct</div><div id="statCorrect" class="stat-num">0</div></div></div>
-            <div class="stat-tile" style="width:100%;"><div class="stat-label">Accuracy</div><div id="statAccuracy" class="stat-num">0%</div></div>
-            <div id="resultDetailBox" class="status-box">Ready for another showdown?</div>
-            <div class="btn-row"><button id="btnPlayAgain" type="button" class="qd-western-btn primary">Play Again</button><button id="qdResultBackHubBtn" type="button" class="qd-western-btn secondary">◀ Hub</button></div>
-          </div>
-        </section>
-      </div>
-    </main>
-  </section>
+  const messages = [
+    [0,  "INITIALIZING NEW WORLD...", "LOADING ASSETS"],
+    [30, "LOADING PLAYER DATA...", "SYNCING DATA"],
+    [60, "UPGRADING YOUR EXPERIENCE...", "UPGRADING"],
+    [85, "NEW LEVEL FOUND!", "ALMOST THERE"],
+    [100, "READY! ENTERING LEXICALSPACE...", "COMPLETE"]
+  ];
 
-  <!-- VIEW 2: VOCAB POKER -->
-  <section id="view-poker" class="view-screen hidden">
-    <main id="gameFrame" class="game-frame select-none">
-      <header class="flex items-center justify-between px-2 py-1.5 bg-[#1B0E08] border border-[#D4AF37]/50 rounded-xl shadow-md shrink-0 gap-1">
-        <div class="flex items-center gap-1 min-w-0">
-          <button id="pokerBtnBackHub" type="button" class="hub-return-btn">◀ HUB</button>
-          <div class="px-2 py-0.5 rounded-lg bg-[#9E2A2B] border border-[#D4AF37]"><span id="roundCounterText" class="font-western text-[10px] sm:text-xs text-[#F6EBD8]">ROUND 1</span></div>
-          <div class="px-2 py-0.5 rounded-lg bg-[#2C180E] border border-[#D4AF37]/40 text-[10px] text-[#E8D5B5]"><span id="deckProgressText">DECK 0/0</span></div>
-        </div>
-        <div class="flex items-center gap-1 shrink-0">
-          <button id="restartBtn" type="button" class="western-btn px-2 py-1 rounded-lg text-[11px] font-bold"><svg class="w-3.5 h-3.5 text-[#D4AF37]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></button>
-          <button id="soundToggleBtn" type="button" class="western-btn px-2 py-1 rounded-lg"><svg id="soundOnIcon" class="w-4 h-4 text-[#D4AF37]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg><svg id="soundOffIcon" class="w-4 h-4 text-[#C83E3B] hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg></button>
-        </div>
-      </header>
-      <section class="relative flex items-center justify-center gap-2 px-2 py-1 shrink-0 pointer-events-none">
-        <div class="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 flex items-center justify-center">
-          <svg viewBox="0 0 140 130" class="w-full h-full drop-shadow-[0_4px_6px_rgba(0,0,0,0.85)]"><circle cx="70" cy="68" r="52" fill="#3B1F10"/><path d="M22 124 C25 93, 45 86, 70 86 C95 86, 115 93, 118 124 Z" fill="#3D2012"/><path d="M46 90 L62 124 L78 124 L94 90" fill="#231108"/><path d="M50 48 L50 72 Q50 88 70 88 Q90 88 90 72 L90 48 Z" fill="#D9A173"/></svg>
-        </div>
-        <div class="relative bg-[#F6EBD8] text-[#1E110A] border-2 border-[#2A160B] rounded-2xl px-3.5 py-2 shadow max-w-[230px]">
-          <p id="cowboySpeech" class="font-card-word font-extrabold text-xs sm:text-sm tracking-tight leading-snug">“Make your move.”</p>
-          <div id="turnStatusSubtext" class="text-[10px] font-bold text-[#9E2A2B] uppercase tracking-wider mt-0.5">Match the highlighted card</div>
-        </div>
-      </section>
-      <section id="pokerTable" class="poker-table">
-        <div class="flex flex-col flex-1 min-h-0"><div class="flex items-center justify-between px-1 mb-0.5"><span class="text-[10px] font-bold text-[#E8D5B5]/85">Outlaw's Hand</span><span id="turnCounterBadge" class="text-[10px] font-bold text-[#F3D060]">CARD 1 OF 4</span></div><div id="opponentGrid" class="cards-grid"></div></div>
-        <div class="relative flex items-center justify-center my-1.5 z-10"><div class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-[#D4AF37]/70 to-[#D4AF37]"></div><div id="tableCenterBadge" class="mx-2 px-3 py-0.5 rounded-full bg-[#1B0E07]/95 border border-[#D4AF37]"><span id="tableStatusText" class="font-western text-[10px] sm:text-[11px] text-[#F6EBD8]">SELECT SYNONYM</span></div><div class="h-[1px] flex-1 bg-gradient-to-l from-transparent via-[#D4AF37]/70 to-[#D4AF37]"></div></div>
-        <div class="flex flex-col flex-1 min-h-0"><div class="flex items-center justify-between px-1 mb-0.5"><span class="text-[10px] font-bold text-[#E8D5B5]/85">Your Hand</span><span id="roundMatchTracker" class="text-[10px] font-bold text-[#E8D5B5]/90">0 / 4 MATCHED</span></div><div id="studentGrid" class="cards-grid"></div></div>
-        <div id="roundResultToast" class="pointer-events-none absolute inset-x-3 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center opacity-0 scale-90 transition-all"><div class="px-4 py-2.5 rounded-xl border-2 border-[#D4AF37] bg-[#1E110A]/95 text-center"><p id="roundResultTitle" class="font-western text-sm sm:text-base text-[#F3D060]">ROUND BONUS</p><p id="roundResultSub" class="text-[11px] font-semibold text-[#F6EBD8] mt-0.5">Matched!</p></div></div>
-        <div id="wrongShotOverlay" class="pointer-events-none absolute inset-0 z-25 hidden items-center justify-center"></div>
-      </section>
-      <footer class="px-2.5 py-1.5 bg-[#190D07] border border-[#D4AF37]/60 rounded-xl shadow-inner shrink-0 flex items-center justify-between gap-2">
-        <div class="flex items-center gap-2"><div class="relative w-9 h-9 shrink-0 flex items-center justify-center"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21" fill="#9E2A2B" stroke="#D4AF37" stroke-width="2.5"/></svg></div><div><div class="flex items-baseline gap-1.5"><span class="font-western text-xs sm:text-sm text-[#F3D060]">CHIPS:</span><span id="chipCountValue" class="font-western text-base sm:text-lg text-[#F6EBD8]">5</span><span class="text-[11px] font-bold text-[#E8D5B5]/70">/ 10</span></div><div class="text-[9px] sm:text-[10px] text-[#E8D5B5]/75 font-medium leading-none">-2 Chips per error</div></div></div>
-        <div id="chipStackContainer" class="flex items-center gap-1 px-1.5 py-1 rounded-lg bg-[#110804] border border-[#D4AF37]/30"></div>
-      </footer>
-      <div id="endingOverlay" class="hidden absolute inset-0 z-50 flex-col items-center justify-between p-5 bg-[#0B0503]/92 backdrop-blur-[2px] overflow-hidden">
-        <div id="endingBulletHoles" class="absolute inset-0 pointer-events-none z-10"></div>
-        <div class="relative z-20 mt-4 text-center"><div id="endingBadge" class="inline-block px-3.5 py-1 rounded-full border border-[#D4AF37] bg-[#2B150C] font-western text-xs text-[#F3D060]">SHOWDOWN OVER</div></div>
-        <div id="endingCardBox" class="relative z-20 w-full max-w-xs bg-gradient-to-b from-[#2A160D] to-[#160B06] border-2 border-[#D4AF37] rounded-2xl p-5 text-center opacity-0 translate-y-4 transition-all">
-          <h2 id="endingExactMessage" class="font-card-word font-extrabold text-lg sm:text-xl text-[#F6EBD8] leading-snug mb-2 px-1">Message</h2>
-          <p id="endingStatsSummary" class="text-xs text-[#E8D5B5]/80 font-medium mb-4">Stats</p>
-          <div class="flex flex-col gap-2"><button id="playAgainBtn" type="button" class="w-full py-2.5 px-5 rounded-xl font-western text-sm text-[#1E110A] bg-[#F3D060]">Play Again</button><button id="pokerEndingBackHubBtn" type="button" class="western-btn w-full py-2 px-4 rounded-xl font-western text-xs">◀ Hub</button></div>
-        </div>
-      </div>
-    </main>
-  </section>
+  const start = Date.now();
+  const duration = 4000;
+  let redirected = false;
 
-  <!-- =========================================================================
-       ES MODULE BOOTSTRAP: FIREBASE + INDEXEDDB REPOSITORY + CONTROLLERS
-       ========================================================================= -->
-  <script type="module">
-    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+  function update() {
+    if (redirected) return;
 
-    // Exact Firebase configuration verified from LexicalSpace (newestfinal_2.html)
-    const firebaseConfig = {
-      apiKey: "AIzaSyCAejXQfHKQ0ZKTpR7kphaDFCGqCcuoRfI",
-      authDomain: "home-page-d6c39.firebaseapp.com",
-      projectId: "home-page-d6c39",
-      storageBucket: "home-page-d6c39.firebasestorage.app",
-      messagingSenderId: "916831594708",
-      appId: "1:916831594708:web:64d97a5a3b8872f7173341"
-    };
+    const elapsed = Date.now() - start;
+    const progress = Math.min(100, elapsed / duration * 100);
+    const value = Math.floor(progress);
 
-    let firestoreDb = null;
-    try {
-      if (firebaseConfig.projectId) {
-        const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-        firestoreDb = getFirestore(app);
-      }
-    } catch (e) {
-      console.warn("Firebase Init Skipped/Failed:", e);
+    fill.style.width = value + "%";
+    percent.textContent = value + "%";
+    bar.setAttribute("aria-valuenow", value);
+
+    let current = messages[0];
+    for (const message of messages) {
+      if (value >= message[0]) current = message;
     }
 
-    /*************************************************************************
-     * MODULE 1: UNIFIED VOCABULARY REPOSITORY (IDB -> FIREBASE -> CACHE)
-     *************************************************************************/
-    const LexicalVocabRepository = (function () {
-      const IDB_NAME = 'LexicalSpaceDB';
-      const WORDS_STORE = 'words';
-      const CACHE_DB_NAME = 'ArcadeSpaceCacheDB';
-      const CACHE_DB_VERSION = 1;
-      const CACHE_STORE = 'firebase_cache';
-      const MIN_PLAYABLE_WORDS = 4;
-
-      let rawWordsCache = [];
-      let totalDbRecordsCount = 0;
-      let studentRecordsCount = 0;
-      let activeStudent = normalizeText(localStorage.getItem('vocab_user') || '');
-      let currentSource = 'NONE';
-      let lastError = null;
-      let idbDiagnostic = null;
-      let loadPromise = null;
-
-      function normalizeText(str) {
-        return typeof str === 'string' ? str.trim() : '';
-      }
-
-      function normalizeKey(str) {
-        return normalizeText(str).toLowerCase();
-      }
-
-      // Matches LexicalSpace's getStudentKey(username)
-      function getStudentKey(username) {
-        return normalizeText(username).replace(/[^a-zA-Z0-9_-]/g, '_');
-      }
-
-      function getOriginDiagnostic() {
-        const isFileProtocol = window.location.protocol === 'file:';
-        const originStr = window.location.origin && window.location.origin !== 'null'
-          ? window.location.origin
-          : window.location.protocol + '//' + (window.location.host || 'local-file');
-        if (isFileProtocol) {
-          return `Origin Notice: Running under file:// (${originStr}). Browsers isolate IndexedDB between separate local file:// paths. To share LexicalSpaceDB directly, serve both LexicalSpace and ArcadeSpace from the same HTTP/HTTPS origin (same protocol, hostname, and port).`;
-        }
-        return `Origin Info: IndexedDB is scoped to origin (${originStr}). LexicalSpace and ArcadeSpace must run on the exact same protocol, hostname, and port to share LexicalSpaceDB.`;
-      }
-
-      /**
-       * Read-only access to LexicalSpaceDB -> words.
-       * Never creates a fake empty LexicalSpaceDB or fake words object store.
-       */
-      async function readLexicalSpaceIDB() {
-        if (!('indexedDB' in window)) {
-          return { exists: false, records: [], reason: 'IndexedDB is not supported in this browser.' };
-        }
-
-        // 1. Safe existence check where supported by the browser
-        if (typeof indexedDB.databases === 'function') {
-          try {
-            const dbs = await indexedDB.databases();
-            if (Array.isArray(dbs) && !dbs.some(d => d && d.name === IDB_NAME)) {
-              return {
-                exists: false,
-                records: [],
-                reason: `${IDB_NAME} does not exist on this browser origin.`
-              };
-            }
-          } catch (_) {
-            // Fallback to open check if indexedDB.databases() is restricted
-          }
-        }
-
-        // 2. Open without version; abort transaction immediately if onupgradeneeded fires
-        // so we NEVER create a fake empty LexicalSpaceDB.
-        return new Promise((resolve) => {
-          let abortedNewDb = false;
-          let req;
-          try {
-            req = indexedDB.open(IDB_NAME);
-          } catch (err) {
-            return resolve({
-              exists: false,
-              records: [],
-              reason: `Cannot open ${IDB_NAME}: ${err && err.message ? err.message : String(err)}`
-            });
-          }
-
-          req.onupgradeneeded = (e) => {
-            abortedNewDb = true;
-            try {
-              const db = e.target.result;
-              if (e.target.transaction) e.target.transaction.abort();
-              if (db) db.close();
-            } catch (_) {}
-          };
-
-          req.onerror = () => {
-            if (abortedNewDb) {
-              try { indexedDB.deleteDatabase(IDB_NAME); } catch (_) {}
-              return resolve({
-                exists: false,
-                records: [],
-                reason: `${IDB_NAME} was not found on this origin.`
-              });
-            }
-            resolve({
-              exists: false,
-              records: [],
-              reason: `Error reading ${IDB_NAME}: ${req.error ? req.error.message : 'Unknown error'}`
-            });
-          };
-
-          req.onsuccess = (e) => {
-            const db = e.target.result;
-            if (abortedNewDb) {
-              try { db.close(); } catch (_) {}
-              return resolve({
-                exists: false,
-                records: [],
-                reason: `${IDB_NAME} was not found on this origin.`
-              });
-            }
-
-            if (!db.objectStoreNames.contains(WORDS_STORE)) {
-              db.close();
-              return resolve({
-                exists: false,
-                records: [],
-                reason: `Object store "${WORDS_STORE}" not found in ${IDB_NAME}.`
-              });
-            }
-
-            try {
-              const tx = db.transaction(WORDS_STORE, 'readonly');
-              const store = tx.objectStore(WORDS_STORE);
-              const getAllReq = store.getAll();
-
-              getAllReq.onsuccess = () => {
-                const records = Array.isArray(getAllReq.result) ? getAllReq.result : [];
-                db.close();
-                resolve({ exists: true, records, reason: null });
-              };
-
-              getAllReq.onerror = () => {
-                const errMsg = getAllReq.error ? getAllReq.error.message : 'Failed reading records';
-                db.close();
-                resolve({ exists: true, records: [], reason: errMsg });
-              };
-            } catch (txErr) {
-              db.close();
-              resolve({
-                exists: false,
-                records: [],
-                reason: txErr && txErr.message ? txErr.message : String(txErr)
-              });
-            }
-          };
-        });
-      }
-
-      /**
-       * Opens ArcadeSpaceCacheDB.
-       * When createIfMissing is false, aborts if the cache DB doesn't exist yet.
-       */
-      function openCacheDB(createIfMissing = false) {
-        return new Promise((resolve, reject) => {
-          if (!('indexedDB' in window)) {
-            return reject(new Error('IndexedDB not supported.'));
-          }
-
-          let aborted = false;
-          const req = createIfMissing
-            ? indexedDB.open(CACHE_DB_NAME, CACHE_DB_VERSION)
-            : indexedDB.open(CACHE_DB_NAME);
-
-          req.onupgradeneeded = (e) => {
-            const db = e.target.result;
-            if (!createIfMissing) {
-              aborted = true;
-              try {
-                if (e.target.transaction) e.target.transaction.abort();
-                db.close();
-              } catch (_) {}
-              return;
-            }
-            if (!db.objectStoreNames.contains(CACHE_STORE)) {
-              db.createObjectStore(CACHE_STORE, { keyPath: 'id' });
-            }
-          };
-
-          req.onsuccess = (e) => {
-            const db = e.target.result;
-            if (aborted) {
-              try { db.close(); } catch (_) {}
-              return reject(new Error('Cache DB does not exist yet.'));
-            }
-            if (!db.objectStoreNames.contains(CACHE_STORE)) {
-              db.close();
-              return reject(new Error(`Cache store "${CACHE_STORE}" not found.`));
-            }
-            resolve(db);
-          };
-
-          req.onerror = () => {
-            if (aborted) {
-              try { indexedDB.deleteDatabase(CACHE_DB_NAME); } catch (_) {}
-            }
-            reject(req.error || new Error('Failed to open ArcadeSpaceCacheDB.'));
-          };
-        });
-      }
-
-      async function saveToCache(username, rawRecords, normalizedVocabulary) {
-        const cleanUser = normalizeText(username);
-        const normKey = normalizeKey(cleanUser);
-        if (!normKey) return;
-
-        let db = null;
-        try {
-          db = await openCacheDB(true);
-          const tx = db.transaction(CACHE_STORE, 'readwrite');
-          const store = tx.objectStore(CACHE_STORE);
-
-          const serializableVocab = normalizedVocabulary.map(item => ({
-            id: item.id,
-            username: cleanUser,
-            word: item.word,
-            meaning: item.meaning,
-            synonyms: [...item.synonyms],
-            synonym1: item.synonyms[0] || '',
-            synonym2: item.synonyms[1] || '',
-            topic: item.topic || 'New Words'
-          }));
-
-          const snapshot = {
-            id: normKey,
-            studentKey: getStudentKey(cleanUser),
-            username: cleanUser,
-            vocabulary: serializableVocab,
-            data: Array.isArray(rawRecords) ? rawRecords : serializableVocab,
-            timestamp: Date.now()
-          };
-
-          await new Promise((res, rej) => {
-            const req = store.put(snapshot);
-            req.onsuccess = () => res();
-            req.onerror = () => rej(req.error);
-          });
-        } catch (e) {
-          console.warn('Failed saving to ArcadeSpaceCacheDB:', e);
-        } finally {
-          if (db) {
-            try { db.close(); } catch (_) {}
-          }
-        }
-      }
-
-      async function readFromCache(username) {
-        const cleanUser = normalizeText(username);
-        const normKey = normalizeKey(cleanUser);
-        const altStudentKey = getStudentKey(cleanUser);
-        if (!normKey) return null;
-
-        if (typeof indexedDB.databases === 'function') {
-          try {
-            const dbs = await indexedDB.databases();
-            if (Array.isArray(dbs) && !dbs.some(d => d && d.name === CACHE_DB_NAME)) {
-              return null;
-            }
-          } catch (_) {}
-        }
-
-        let db = null;
-        try {
-          db = await openCacheDB(false);
-          const tx = db.transaction(CACHE_STORE, 'readonly');
-          const store = tx.objectStore(CACHE_STORE);
-
-          const record = await new Promise((res, rej) => {
-            const req = store.get(normKey);
-            req.onsuccess = () => res(req.result || null);
-            req.onerror = () => rej(req.error);
-          });
-
-          if (record) return record;
-
-          // Secondary check by studentKey if stored under sanitized key
-          const allRecords = await new Promise((res, rej) => {
-            const req = store.getAll();
-            req.onsuccess = () => res(Array.isArray(req.result) ? req.result : []);
-            req.onerror = () => rej(req.error);
-          });
-
-          return allRecords.find(r =>
-            r && (
-              normalizeKey(r.id) === normKey ||
-              normalizeKey(r.username) === normKey ||
-              (altStudentKey && r.studentKey === altStudentKey)
-            )
-          ) || null;
-        } catch (_) {
-          return null;
-        } finally {
-          if (db) {
-            try { db.close(); } catch (_) {}
-          }
-        }
-      }
-
-      async function fetchFromFirebase(username) {
-        const cleanUser = normalizeText(username);
-        if (!cleanUser) throw new Error('No active student account specified.');
-        if (!firestoreDb) throw new Error('Firebase Firestore is not initialized.');
-        if (!navigator.onLine) throw new Error('Browser is currently offline.');
-
-        const wordsRef = collection(firestoreDb, 'words');
-        const candidateNames = Array.from(new Set([
-          cleanUser,
-          cleanUser.toLowerCase(),
-          cleanUser.charAt(0).toUpperCase() + cleanUser.slice(1).toLowerCase()
-        ])).filter(Boolean);
-
-        const seenIds = new Set();
-        const results = [];
-
-        for (const candidate of candidateNames) {
-          const q = query(wordsRef, where('username', '==', candidate));
-          const querySnapshot = await getDocs(q);
-          querySnapshot.forEach((docSnap) => {
-            if (!seenIds.has(docSnap.id)) {
-              seenIds.add(docSnap.id);
-              results.push({ id: docSnap.id, ...docSnap.data() });
-            }
-          });
-          if (results.length > 0 && candidate === cleanUser) {
-            break;
-          }
-        }
-
-        return results;
-      }
-
-      function extractSynonymsFromRecord(rec) {
-        const rawCandidates = [];
-        if (Array.isArray(rec.synonyms)) {
-          rawCandidates.push(...rec.synonyms);
-        } else if (typeof rec.synonyms === 'string' && rec.synonyms.trim()) {
-          rawCandidates.push(...rec.synonyms.split(','));
-        }
-        if (rec.synonym1) rawCandidates.push(rec.synonym1);
-        if (rec.synonym2) rawCandidates.push(rec.synonym2);
-        if (rec.synonym) rawCandidates.push(rec.synonym);
-
-        return rawCandidates.map(normalizeText).filter(Boolean);
-      }
-
-      /**
-       * Filters and normalizes records using LexicalSpace's exact rules:
-       * - In LexicalSpace (newestfinal_2.html line 743):
-       *   wordsData = allWords.filter(w => !w.username || w.username.toLowerCase() === currentUser.toLowerCase())
-       * - When strictUserMatch is true (used for Firebase/Cache), requires explicit username match
-       *   or pre-scoped student cache.
-       */
-      function processAndFilterWords(records, targetUser, allowLegacyUnscoped = true) {
-        const targetKey = normalizeKey(targetUser);
-        if (!targetKey || !Array.isArray(records)) {
-          return { studentRecords: [], playableWords: [], distinctSynonymCount: 0 };
-        }
-
-        const studentRecords = records.filter(rec => {
-          if (!rec || typeof rec !== 'object') return false;
-          const recUserKey = normalizeKey(rec.username);
-          if (!recUserKey) return allowLegacyUnscoped;
-          return recUserKey === targetKey;
-        });
-
-        const wordMap = new Map();
-        const globalSynonymKeys = new Set();
-
-        for (const rec of studentRecords) {
-          const word = normalizeText(rec.word);
-          const meaning = normalizeText(rec.meaning || rec.translation || rec.vi);
-          if (!word || !meaning) continue;
-
-          const wordKey = normalizeKey(word);
-          const candidateSyns = extractSynonymsFromRecord(rec);
-
-          const validSynonyms = [];
-          const seenSynKeys = new Set([wordKey]);
-          for (const s of candidateSyns) {
-            const sKey = normalizeKey(s);
-            if (sKey && !seenSynKeys.has(sKey)) {
-              seenSynKeys.add(sKey);
-              validSynonyms.push(s);
-              globalSynonymKeys.add(sKey);
-            }
-          }
-
-          if (validSynonyms.length === 0) continue;
-
-          if (!wordMap.has(wordKey)) {
-            wordMap.set(wordKey, {
-              id: rec.id || `vocab_${wordMap.size + 1}`,
-              username: normalizeText(rec.username) || normalizeText(targetUser),
-              word,
-              meaning,
-              topic: normalizeText(rec.topic) || 'New Words',
-              synonyms: [...validSynonyms],
-              forbiddenKeys: new Set([wordKey, ...validSynonyms.map(normalizeKey)])
-            });
-          } else {
-            const existing = wordMap.get(wordKey);
-            for (const syn of validSynonyms) {
-              const sKey = normalizeKey(syn);
-              if (!existing.forbiddenKeys.has(sKey)) {
-                existing.synonyms.push(syn);
-                existing.forbiddenKeys.add(sKey);
-              }
-            }
-          }
-        }
-
-        return {
-          studentRecords,
-          playableWords: Array.from(wordMap.values()),
-          distinctSynonymCount: globalSynonymKeys.size
-        };
-      }
-
-      function isPoolPlayableForGames(playableWords, distinctSynonymCount) {
-        return Array.isArray(playableWords) &&
-          playableWords.length >= MIN_PLAYABLE_WORDS &&
-          distinctSynonymCount >= MIN_PLAYABLE_WORDS;
-      }
-
-      async function loadVocabularyForCurrentAccount() {
-        if (loadPromise) return loadPromise;
-
-        loadPromise = (async () => {
-          lastError = null;
-          idbDiagnostic = null;
-          rawWordsCache = [];
-          totalDbRecordsCount = 0;
-          studentRecordsCount = 0;
-          currentSource = 'NONE';
-
-          // Always sync activeStudent from localStorage if updated by LexicalSpace
-          const storedUser = normalizeText(localStorage.getItem('vocab_user') || '');
-          if (storedUser && !activeStudent) {
-            activeStudent = storedUser;
-          }
-
-          if (!activeStudent) {
-            lastError = 'No active student account selected. Tap "Switch Account" to enter your LexicalSpace username.';
-            idbDiagnostic = getOriginDiagnostic();
-            return getStats();
-          }
-
-          let idbStatusReason = '';
-          let firebaseErrorMsg = '';
-
-          // =================================================================
-          // PRIORITY 1: LexicalSpaceDB -> words (Read-Only, Same-Origin)
-          // =================================================================
-          const idbResult = await readLexicalSpaceIDB();
-          if (idbResult.exists) {
-            totalDbRecordsCount = idbResult.records.length;
-            const parsedIdb = processAndFilterWords(idbResult.records, activeStudent, true);
-            studentRecordsCount = parsedIdb.studentRecords.length;
-
-            if (isPoolPlayableForGames(parsedIdb.playableWords, parsedIdb.distinctSynonymCount)) {
-              rawWordsCache = parsedIdb.playableWords;
-              currentSource = 'LEXICALSPACE INDEXEDDB';
-              return getStats();
-            } else {
-              idbStatusReason = `LexicalSpaceDB has ${studentRecordsCount} word(s) for "${activeStudent}", but only ${parsedIdb.playableWords.length} playable word(s) with synonyms (minimum ${MIN_PLAYABLE_WORDS} required).`;
-            }
-          } else {
-            idbStatusReason = idbResult.reason || 'LexicalSpaceDB unavailable on this origin.';
-          }
-
-          // =================================================================
-          // PRIORITY 2: Firebase Firestore Fallback (Online Only)
-          // =================================================================
-          if (navigator.onLine && firestoreDb) {
-            try {
-              const fbRecords = await fetchFromFirebase(activeStudent);
-              const parsedFb = processAndFilterWords(fbRecords, activeStudent, false);
-
-              if (fbRecords.length > 0) {
-                totalDbRecordsCount = Math.max(totalDbRecordsCount, fbRecords.length);
-                studentRecordsCount = Math.max(studentRecordsCount, parsedFb.studentRecords.length);
-              }
-
-              if (isPoolPlayableForGames(parsedFb.playableWords, parsedFb.distinctSynonymCount)) {
-                rawWordsCache = parsedFb.playableWords;
-                currentSource = 'FIREBASE';
-                await saveToCache(activeStudent, fbRecords, parsedFb.playableWords);
-                return getStats();
-              } else {
-                firebaseErrorMsg = fbRecords.length === 0
-                  ? `Firebase returned 0 words for student "${activeStudent}".`
-                  : `Firebase returned ${fbRecords.length} word(s) for "${activeStudent}", but only ${parsedFb.playableWords.length} had valid meanings & synonyms (need ${MIN_PLAYABLE_WORDS}+).`;
-              }
-            } catch (fbErr) {
-              firebaseErrorMsg = `Firebase request failed: ${fbErr && fbErr.message ? fbErr.message : String(fbErr)}`;
-              console.warn('Firebase fallback warning:', fbErr);
-            }
-          } else {
-            firebaseErrorMsg = !navigator.onLine
-              ? 'Device is offline (Firebase skipped).'
-              : 'Firebase client unavailable.';
-          }
-
-          // =================================================================
-          // PRIORITY 3: ArcadeSpaceCacheDB -> firebase_cache (Per-Student)
-          // =================================================================
-          const cachedSnapshot = await readFromCache(activeStudent);
-          if (cachedSnapshot) {
-            const sourceArray = Array.isArray(cachedSnapshot.vocabulary) && cachedSnapshot.vocabulary.length > 0
-              ? cachedSnapshot.vocabulary
-              : (Array.isArray(cachedSnapshot.data) ? cachedSnapshot.data : []);
-
-            const parsedCache = processAndFilterWords(sourceArray, activeStudent, true);
-            if (isPoolPlayableForGames(parsedCache.playableWords, parsedCache.distinctSynonymCount)) {
-              rawWordsCache = parsedCache.playableWords;
-              totalDbRecordsCount = Math.max(totalDbRecordsCount, sourceArray.length);
-              studentRecordsCount = Math.max(studentRecordsCount, parsedCache.studentRecords.length);
-              currentSource = 'ARCADE CACHE';
-              return getStats();
-            }
-          }
-
-          // =================================================================
-          // PRIORITY 4: All Sources Exhausted — Report Clear Diagnostic Error
-          // =================================================================
-          lastError = [
-            idbStatusReason,
-            firebaseErrorMsg,
-            `No valid cached snapshot found in ArcadeSpaceCacheDB for "${activeStudent}".`
-          ].filter(Boolean).join(' ');
-          idbDiagnostic = getOriginDiagnostic();
-
-          return getStats();
-        })();
-
-        try {
-          return await loadPromise;
-        } finally {
-          loadPromise = null;
-        }
-      }
-
-      function setStudent(username) {
-        const clean = normalizeText(username);
-        if (!clean) return false;
-        activeStudent = clean;
-        rawWordsCache = [];
-        totalDbRecordsCount = 0;
-        studentRecordsCount = 0;
-        currentSource = 'NONE';
-        localStorage.setItem('vocab_user', clean);
-        return true;
-      }
-
-      function getStats() {
-        return {
-          activeStudent: activeStudent || '(Not Set)',
-          source: currentSource,
-          totalWordsCount: totalDbRecordsCount,
-          studentWordsCount: studentRecordsCount,
-          playableCount: rawWordsCache.length,
-          canPlayGames: rawWordsCache.length >= MIN_PLAYABLE_WORDS,
-          lastError,
-          idbDiagnostic
-        };
-      }
-
-      function getNormalizedPlayablePool() {
-        return rawWordsCache.map(item => ({
-          ...item,
-          synonyms: [...item.synonyms],
-          forbiddenKeys: new Set(item.forbiddenKeys)
-        }));
-      }
-
-      return {
-        loadVocabularyForCurrentAccount,
-        getStats,
-        getNormalizedPlayablePool,
-        setStudent,
-        normalizeText,
-        normalizeKey
-      };
-    })();
-
-    /*************************************************************************
-     * MODULE 2: HUB CONTROLLER
-     *************************************************************************/
-    const HubController = (function () {
-      let activeScreen = 'hub';
-      let hubSoundEnabled = true;
-      let audioCtx = null;
-
-      const dom = {
-        screenTransition: document.getElementById('screenTransitionOverlay'),
-        viewHub: document.getElementById('view-hub'),
-        viewQuickDrawn: document.getElementById('view-quick-drawn'),
-        viewPoker: document.getElementById('view-poker'),
-        hubSoundBtn: document.getElementById('hubSoundBtn'),
-        hubSwitchAccountBtn: document.getElementById('hubSwitchAccountBtn'),
-        idbStatusDot: document.getElementById('idbStatusDot'),
-        idbStatusText: document.getElementById('idbStatusText'),
-        hubActiveStudentText: document.getElementById('hubActiveStudentText'),
-        hubStatTotalWords: document.getElementById('hubStatTotalWords'),
-        hubStatStudentWords: document.getElementById('hubStatStudentWords'),
-        hubStatPlayableWords: document.getElementById('hubStatPlayableWords'),
-        hubIdbNotice: document.getElementById('hubIdbNotice'),
-        btnLaunchQuickDrawn: document.getElementById('btnLaunchQuickDrawn'),
-        btnLaunchPoker: document.getElementById('btnLaunchPoker'),
-
-        // Modal
-        accountEditModal: document.getElementById('accountEditModal'),
-        accountEditForm: document.getElementById('accountEditForm'),
-        accountNameInput: document.getElementById('accountNameInput'),
-        accountModalError: document.getElementById('accountModalError'),
-        btnCloseAccountModal: document.getElementById('btnCloseAccountModal'),
-        btnCancelAccountEdit: document.getElementById('btnCancelAccountEdit')
-      };
-
-      function ensureAudio() {
-        if (!hubSoundEnabled) return null;
-        if (!audioCtx) {
-          const Ctx = window.AudioContext || window.webkitAudioContext;
-          if (Ctx) audioCtx = new Ctx();
-        }
-        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
-        return audioCtx;
-      }
-
-      function playBeep(freq = 660, duration = 0.06) {
-        const ctx = ensureAudio();
-        if (!ctx) return;
-        const now = ctx.currentTime;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(freq, now);
-        gain.gain.setValueAtTime(0.08, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(now);
-        osc.stop(now + duration + 0.01);
-      }
-
-      function escapeHtml(str) {
-        return String(str || '').replace(/[&<>"']/g, (ch) => ({
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#39;'
-        }[ch]));
-      }
-
-      async function syncAndRenderHubUI() {
-        dom.idbStatusText.textContent = 'LOADING VOCABULARY...';
-        dom.idbStatusDot.className = 'inline-block w-3 h-3 shrink-0 bg-amber-400 border border-black shadow-[0_0_6px_#fbbf24] animate-pulse';
-        dom.btnLaunchQuickDrawn.disabled = true;
-        dom.btnLaunchPoker.disabled = true;
-
-        const stats = await LexicalVocabRepository.loadVocabularyForCurrentAccount();
-
-        dom.hubActiveStudentText.textContent = stats.activeStudent;
-        dom.hubStatTotalWords.textContent = stats.totalWordsCount;
-        dom.hubStatStudentWords.textContent = stats.studentWordsCount;
-        dom.hubStatPlayableWords.textContent = stats.playableCount;
-
-        dom.idbStatusText.textContent = `SRC: ${stats.source}`;
-
-        if (stats.canPlayGames) {
-          dom.idbStatusDot.className = 'inline-block w-3 h-3 shrink-0 bg-emerald-400 border border-black shadow-[0_0_6px_#34d399]';
-          dom.hubIdbNotice.classList.add('hidden');
-          dom.hubIdbNotice.innerHTML = '';
-          dom.btnLaunchQuickDrawn.disabled = false;
-          dom.btnLaunchPoker.disabled = false;
-        } else {
-          dom.idbStatusDot.className = 'inline-block w-3 h-3 shrink-0 bg-rose-500 border border-black';
-          dom.hubIdbNotice.classList.remove('hidden');
-          dom.btnLaunchQuickDrawn.disabled = true;
-          dom.btnLaunchPoker.disabled = true;
-
-          const diagHtml = stats.idbDiagnostic
-            ? `<div class="mt-1.5 pt-1.5 border-t border-rose-400/40 text-[11px] text-amber-200 font-normal">${escapeHtml(stats.idbDiagnostic)}</div>`
-            : '';
-
-          dom.hubIdbNotice.innerHTML = `
-            <div><strong>Vocabulary Unavailable:</strong> ${escapeHtml(stats.lastError || 'Need at least 4 words with valid meanings and synonyms.')}</div>
-            ${diagHtml}
-            <div class="mt-2 flex items-center gap-2">
-              <button id="hubRetryLoadBtn" type="button" class="pixel-filter-btn px-3 py-1 min-h-[34px] text-xs bg-[#ffd43b] text-[#180929] border-white font-extrabold">
-                ↻ RETRY
-              </button>
-              <span class="text-[11px] text-rose-200">or tap <strong>Switch Account</strong> above.</span>
-            </div>
-          `;
-
-          const retryBtn = document.getElementById('hubRetryLoadBtn');
-          if (retryBtn) {
-            retryBtn.addEventListener('click', () => {
-              playBeep(720, 0.05);
-              syncAndRenderHubUI();
-            });
-          }
-        }
-        return stats;
-      }
-
-      function openModal() {
-        playBeep(680, 0.05);
-        const stats = LexicalVocabRepository.getStats();
-        dom.accountNameInput.value = stats.activeStudent === '(Not Set)' ? '' : stats.activeStudent;
-        dom.accountModalError.classList.add('hidden');
-        dom.accountEditModal.classList.remove('hidden');
-        setTimeout(() => dom.accountNameInput.focus(), 40);
-      }
-
-      function closeModal() {
-        playBeep(420, 0.05);
-        dom.accountEditModal.classList.add('hidden');
-      }
-
-      async function handleSwitch(e) {
-        e.preventDefault();
-        const val = dom.accountNameInput.value.trim();
-        if (!val) {
-          dom.accountModalError.classList.remove('hidden');
-          return;
-        }
-        LexicalVocabRepository.setStudent(val);
-        closeModal();
-        await syncAndRenderHubUI();
-      }
-
-      function switchScreen(targetScreen) {
-        if (activeScreen === targetScreen) return;
-        dom.screenTransition.classList.add('active');
-        window.setTimeout(async () => {
-          if (activeScreen === 'quick-drawn') window.QuickDrawnAPI.stopAndCleanup();
-          else if (activeScreen === 'poker') window.PokerAPI.stopAndCleanup();
-
-          dom.viewHub.classList.toggle('hidden', targetScreen !== 'hub');
-          dom.viewQuickDrawn.classList.toggle('hidden', targetScreen !== 'quick-drawn');
-          dom.viewPoker.classList.toggle('hidden', targetScreen !== 'poker');
-          activeScreen = targetScreen;
-
-          if (targetScreen === 'hub') await syncAndRenderHubUI();
-          else if (targetScreen === 'quick-drawn') await window.QuickDrawnAPI.enterFromHub();
-          else if (targetScreen === 'poker') await window.PokerAPI.enterFromHub();
-
-          window.setTimeout(() => dom.screenTransition.classList.remove('active'), 140);
-        }, 200);
-      }
-
-      function init() {
-        dom.hubSoundBtn.addEventListener('click', () => {
-          hubSoundEnabled = !hubSoundEnabled;
-          dom.hubSoundBtn.textContent = hubSoundEnabled ? 'SFX: ON' : 'SFX: OFF';
-          if (hubSoundEnabled) playBeep(780, 0.06);
-        });
-
-        dom.hubSwitchAccountBtn.addEventListener('click', openModal);
-        dom.btnCloseAccountModal.addEventListener('click', closeModal);
-        dom.btnCancelAccountEdit.addEventListener('click', closeModal);
-        dom.accountEditForm.addEventListener('submit', handleSwitch);
-
-        dom.btnLaunchQuickDrawn.addEventListener('click', () => switchScreen('quick-drawn'));
-        dom.btnLaunchPoker.addEventListener('click', () => switchScreen('poker'));
-
-        window.addEventListener('online', () => {
-          if (activeScreen === 'hub' && !LexicalVocabRepository.getStats().canPlayGames) {
-            syncAndRenderHubUI();
-          }
-        });
-
-        window.HubAPI = { switchScreen, refreshVocabulary: syncAndRenderHubUI };
-
-        syncAndRenderHubUI();
-      }
-
-      return { init };
-    })();
-
-    /*************************************************************************
-     * MODULE 3: QUICK DRAWN
-     * Uses Unified Repository
-     *************************************************************************/
-    const QuickDrawnGame = (function () {
-      const state = {
-        questionBank: [],
-        currentRunQuestions: [],
-        qNum: 0,
-        score: 10,
-        bestScore: 10,
-        attempted: 0,
-        correct: 0,
-        timeLimit: 10,
-        startTime: 0,
-        rafId: null,
-        nextQTimer: null,
-        isLocked: true,
-        active: false,
-        soundEnabled: true,
-        audioCtx: null
-      };
-
-      const dom = {
-        qdBtnBackHub: document.getElementById('qdBtnBackHub'),
-        hudScore: document.getElementById('hudScore'),
-        hudTimer: document.getElementById('hudTimerText'),
-        btnAudioToggle: document.getElementById('btnAudioToggle'),
-        svgSpeakerOn: document.getElementById('svgSpeakerOn'),
-        svgSpeakerOff: document.getElementById('svgSpeakerOff'),
-        feedbackBanner: document.getElementById('feedbackBanner'),
-        duelStage: document.getElementById('duelStage'),
-        fuseFill: document.getElementById('fuseFill'),
-        fuseSpark: document.getElementById('fuseSpark'),
-        wordTxt: document.getElementById('targetWordText'),
-        meanTxt: document.getElementById('targetMeaningText'),
-        btns: Array.from(document.querySelectorAll('#view-quick-drawn .answer-btn')),
-        errScr: document.getElementById('errorScreen'),
-        resScr: document.getElementById('resultScreen'),
-        errBox: document.getElementById('qdVocabStatusBox'),
-        btnPlay: document.getElementById('btnPlayAgain'),
-        statFinalScore: document.getElementById('statFinalScore'),
-        statBestScore: document.getElementById('statBestScore'),
-        statAttempted: document.getElementById('statAttempted'),
-        statCorrect: document.getElementById('statCorrect'),
-        statAccuracy: document.getElementById('statAccuracy'),
-        resultTitleBadge: document.getElementById('resultTitleBadge'),
-        resultSubtitle: document.getElementById('resultSubtitle')
-      };
-
-      function shuffle(arr) {
-        const c = [...arr];
-        for (let i = c.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [c[i], c[j]] = [c[j], c[i]];
-        }
-        return c;
-      }
-
-      function playTone(freq, dur = 0.08, type = 'square') {
-        if (!state.soundEnabled) return;
-        const Ctx = window.AudioContext || window.webkitAudioContext;
-        if (!Ctx) return;
-        if (!state.audioCtx) state.audioCtx = new Ctx();
-        if (state.audioCtx.state === 'suspended') state.audioCtx.resume().catch(() => {});
-        const now = state.audioCtx.currentTime;
-        const osc = state.audioCtx.createOscillator();
-        const gain = state.audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, now);
-        gain.gain.setValueAtTime(0.08, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
-        osc.connect(gain);
-        gain.connect(state.audioCtx.destination);
-        osc.start(now);
-        osc.stop(now + dur + 0.01);
-      }
-
-      function buildBank(pool) {
-        const allSyns = pool.flatMap(p =>
-          p.synonyms.map(s => ({
-            text: s,
-            k: LexicalVocabRepository.normalizeKey(s),
-            src: LexicalVocabRepository.normalizeKey(p.word)
-          }))
-        );
-        const bank = [];
-        for (const p of pool) {
-          const ans = p.synonyms[Math.floor(Math.random() * p.synonyms.length)];
-          const dists = [];
-          const seen = new Set(p.forbiddenKeys);
-          seen.add(LexicalVocabRepository.normalizeKey(ans));
-          for (const c of shuffle(allSyns)) {
-            if (c.src === LexicalVocabRepository.normalizeKey(p.word) || seen.has(c.k)) continue;
-            seen.add(c.k);
-            dists.push(c.text);
-            if (dists.length === 3) break;
-          }
-          if (dists.length === 3) {
-            bank.push({
-              word: p.word,
-              mean: p.meaning,
-              ans,
-              opts: shuffle([ans, ...dists])
-            });
-          }
-        }
-        return shuffle(bank);
-      }
-
-      function stopAndCleanup() {
-        state.active = false;
-        state.isLocked = true;
-        if (state.rafId) {
-          cancelAnimationFrame(state.rafId);
-          state.rafId = null;
-        }
-        if (state.nextQTimer) {
-          clearTimeout(state.nextQTimer);
-          state.nextQTimer = null;
-        }
-      }
-
-      async function enterFromHub() {
-        stopAndCleanup();
-        dom.errScr.classList.add('hidden');
-        dom.resScr.classList.add('hidden');
-
-        let pool = LexicalVocabRepository.getNormalizedPlayablePool();
-        if (pool.length < 4) {
-          await LexicalVocabRepository.loadVocabularyForCurrentAccount();
-          pool = LexicalVocabRepository.getNormalizedPlayablePool();
-        }
-
-        if (pool.length < 4) {
-          const stats = LexicalVocabRepository.getStats();
-          dom.errBox.textContent = stats.lastError || 'Not enough valid words loaded (minimum 4 required).';
-          dom.errScr.classList.remove('hidden');
-          return;
-        }
-
-        state.questionBank = buildBank(pool);
-        if (state.questionBank.length === 0) {
-          dom.errBox.textContent = 'Could not generate 4 distinct synonym choices. Add more unique synonyms for this student.';
-          dom.errScr.classList.remove('hidden');
-          return;
-        }
-        startRun();
-      }
-
-      function startRun() {
-        stopAndCleanup();
-        state.currentRunQuestions = shuffle(state.questionBank);
-        state.score = 10;
-        state.bestScore = 10;
-        state.attempted = 0;
-        state.correct = 0;
-        state.qNum = 0;
-        state.active = true;
-        state.isLocked = true;
-        dom.hudScore.textContent = state.score;
-        dom.resScr.classList.add('hidden');
-        nextQ();
-      }
-
-      function nextQ() {
-        if (!state.active) return;
-        const idxInRun = state.qNum % state.currentRunQuestions.length;
-        if (state.qNum > 0 && idxInRun === 0) {
-          state.currentRunQuestions = shuffle(state.questionBank);
-        }
-        state.qNum++;
-        const q = state.currentRunQuestions[idxInRun];
-        state.timeLimit = Math.max(1.5, 10 - (state.qNum - 1) * 0.4);
-        dom.duelStage.className = 'duel-stage state-idle';
-        dom.fuseFill.classList.remove('urgent');
-        dom.hudTimer.classList.remove('urgent');
-        dom.wordTxt.textContent = q.word;
-        dom.meanTxt.textContent = `(${q.mean})`;
-        dom.btns.forEach((b, i) => {
-          b.className = 'answer-btn';
-          b.disabled = false;
-          b.textContent = q.opts[i];
-        });
-        state.isLocked = false;
-        state.startTime = performance.now();
-        tick(state.startTime);
-      }
-
-      function tick(now) {
-        if (!state.active || state.isLocked) return;
-        const left = Math.max(0, state.timeLimit - ((now - state.startTime) / 1000));
-        const pct = (left / state.timeLimit) * 100;
-        dom.hudTimer.textContent = `Q${state.qNum} • ${left.toFixed(1)}s`;
-        dom.fuseFill.style.width = `${pct}%`;
-        dom.fuseSpark.style.left = `${pct}%`;
-
-        if (left <= 2.5) {
-          dom.fuseFill.classList.add('urgent');
-          dom.hudTimer.classList.add('urgent');
-          dom.duelStage.className = 'duel-stage state-urgent';
-        }
-
-        if (left <= 0) {
-          handleAns(-1);
-          return;
-        }
-        state.rafId = requestAnimationFrame(tick);
-      }
-
-      function showBanner(text, isHit) {
-        if (!dom.feedbackBanner) return;
-        dom.feedbackBanner.textContent = text;
-        dom.feedbackBanner.className = `feedback-banner show ${isHit ? 'hit' : 'miss'}`;
-        setTimeout(() => {
-          dom.feedbackBanner.classList.remove('show');
-        }, 850);
-      }
-
-      function handleAns(idx) {
-        if (!state.active || state.isLocked) return;
-        state.isLocked = true;
-        if (state.rafId) {
-          cancelAnimationFrame(state.rafId);
-          state.rafId = null;
-        }
-        dom.btns.forEach(b => (b.disabled = true));
-
-        const idxInRun = (state.qNum - 1) % state.currentRunQuestions.length;
-        const q = state.currentRunQuestions[idxInRun];
-        const isCor =
-          idx >= 0 &&
-          LexicalVocabRepository.normalizeKey(q.opts[idx]) ===
-            LexicalVocabRepository.normalizeKey(q.ans);
-
-        state.attempted++;
-        if (isCor) {
-          state.correct++;
-          state.score += 1;
-          state.bestScore = Math.max(state.bestScore, state.score);
-          dom.btns[idx].classList.add('correct');
-          dom.duelStage.className = 'duel-stage state-player-win';
-          showBanner('+1 QUICK HIT!', true);
-          playTone(880, 0.1, 'triangle');
-        } else {
-          state.score = Math.max(0, state.score - 3);
-          dom.duelStage.className = 'duel-stage state-enemy-win';
-          if (idx >= 0) dom.btns[idx].classList.add('wrong');
-          dom.btns.forEach((b, i) => {
-            if (
-              LexicalVocabRepository.normalizeKey(q.opts[i]) ===
-              LexicalVocabRepository.normalizeKey(q.ans)
-            ) {
-              b.classList.add('correct');
-            }
-          });
-          showBanner(idx < 0 ? 'TIME OUT! -3' : 'MISS! -3', false);
-          playTone(180, 0.16, 'sawtooth');
-        }
-        dom.hudScore.textContent = state.score;
-
-        state.nextQTimer = setTimeout(() => {
-          if (state.score >= 20 || state.score <= 0) {
-            state.active = false;
-            const won = state.score >= 20;
-            dom.statFinalScore.textContent = state.score;
-            dom.statBestScore.textContent = state.bestScore;
-            dom.statAttempted.textContent = state.attempted;
-            dom.statCorrect.textContent = state.correct;
-            const acc = state.attempted > 0 ? Math.round((state.correct / state.attempted) * 100) : 0;
-            dom.statAccuracy.textContent = `${acc}%`;
-            dom.resultTitleBadge.textContent = won ? 'VICTORY' : 'DEFEAT';
-            dom.resultSubtitle.textContent = won ? 'Fastest gun in the West!' : 'Outdrawn in the dust!';
-            dom.resScr.classList.remove('hidden');
-          } else if (state.active) {
-            nextQ();
-          }
-        }, 1200);
-      }
-
-      function init() {
-        dom.btns.forEach((b, i) => b.addEventListener('click', () => handleAns(i)));
-        dom.btnPlay.addEventListener('click', startRun);
-        if (dom.btnAudioToggle) {
-          dom.btnAudioToggle.addEventListener('click', () => {
-            state.soundEnabled = !state.soundEnabled;
-            dom.btnAudioToggle.classList.toggle('muted', !state.soundEnabled);
-            if (dom.svgSpeakerOn && dom.svgSpeakerOff) {
-              dom.svgSpeakerOn.style.display = state.soundEnabled ? 'block' : 'none';
-              dom.svgSpeakerOff.style.display = state.soundEnabled ? 'none' : 'block';
-            }
-          });
-        }
-        const exit = () => window.HubAPI.switchScreen('hub');
-        dom.qdBtnBackHub.addEventListener('click', exit);
-        document.getElementById('qdErrorBackHubBtn').addEventListener('click', exit);
-        document.getElementById('qdResultBackHubBtn').addEventListener('click', exit);
-      }
-
-      return { init, enterFromHub, stopAndCleanup };
-    })();
-
-    /*************************************************************************
-     * MODULE 4: WILD WEST VOCABULARY POKER
-     * Uses the same validated LexicalVocabRepository and active student
-     *************************************************************************/
-    const WildWestPokerGame = (function () {
-      const SUITS = [
-        { symbol: '♠', cls: 'suit-black' },
-        { symbol: '♥', cls: 'suit-red' },
-        { symbol: '♣', cls: 'suit-black' },
-        { symbol: '♦', cls: 'suit-red' }
-      ];
-      const RANKS = ['A', 'K', 'Q', 'J', '10', '9', '8', '7'];
-
-      const state = {
-        pool: [],
-        deckQueue: [],
-        round: 1,
-        chips: 5,
-        targetTurnIndex: 0,
-        matchedCount: 0,
-        totalMatches: 0,
-        totalErrors: 0,
-        opponentCards: [],
-        studentCards: [],
-        isBusy: false,
-        active: false,
-        soundEnabled: true,
-        audioCtx: null,
-        timers: []
-      };
-
-      const dom = {
-        gameFrame: document.getElementById('gameFrame'),
-        pokerBtnBackHub: document.getElementById('pokerBtnBackHub'),
-        pokerEndingBackHubBtn: document.getElementById('pokerEndingBackHubBtn'),
-        roundCounterText: document.getElementById('roundCounterText'),
-        deckProgressText: document.getElementById('deckProgressText'),
-        restartBtn: document.getElementById('restartBtn'),
-        soundToggleBtn: document.getElementById('soundToggleBtn'),
-        soundOnIcon: document.getElementById('soundOnIcon'),
-        soundOffIcon: document.getElementById('soundOffIcon'),
-        cowboySpeech: document.getElementById('cowboySpeech'),
-        turnStatusSubtext: document.getElementById('turnStatusSubtext'),
-        turnCounterBadge: document.getElementById('turnCounterBadge'),
-        opponentGrid: document.getElementById('opponentGrid'),
-        studentGrid: document.getElementById('studentGrid'),
-        tableStatusText: document.getElementById('tableStatusText'),
-        roundMatchTracker: document.getElementById('roundMatchTracker'),
-        roundResultToast: document.getElementById('roundResultToast'),
-        roundResultTitle: document.getElementById('roundResultTitle'),
-        roundResultSub: document.getElementById('roundResultSub'),
-        chipCountValue: document.getElementById('chipCountValue'),
-        chipStackContainer: document.getElementById('chipStackContainer'),
-        endingOverlay: document.getElementById('endingOverlay'),
-        endingBadge: document.getElementById('endingBadge'),
-        endingCardBox: document.getElementById('endingCardBox'),
-        endingExactMessage: document.getElementById('endingExactMessage'),
-        endingStatsSummary: document.getElementById('endingStatsSummary'),
-        playAgainBtn: document.getElementById('playAgainBtn')
-      };
-
-      function escapeHtml(str) {
-        return String(str || '').replace(/[&<>"']/g, (ch) => ({
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#39;'
-        }[ch]));
-      }
-
-      function shuffle(arr) {
-        const c = [...arr];
-        for (let i = c.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [c[i], c[j]] = [c[j], c[i]];
-        }
-        return c;
-      }
-
-      function scheduleTimer(fn, ms) {
-        const id = setTimeout(fn, ms);
-        state.timers.push(id);
-        return id;
-      }
-
-      function clearTimers() {
-        state.timers.forEach(id => clearTimeout(id));
-        state.timers = [];
-      }
-
-      function playSound(freq, dur = 0.08, type = 'triangle') {
-        if (!state.soundEnabled) return;
-        const Ctx = window.AudioContext || window.webkitAudioContext;
-        if (!Ctx) return;
-        if (!state.audioCtx) state.audioCtx = new Ctx();
-        if (state.audioCtx.state === 'suspended') state.audioCtx.resume().catch(() => {});
-        const now = state.audioCtx.currentTime;
-        const osc = state.audioCtx.createOscillator();
-        const gain = state.audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, now);
-        gain.gain.setValueAtTime(0.08, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + dur);
-        osc.connect(gain);
-        gain.connect(state.audioCtx.destination);
-        osc.start(now);
-        osc.stop(now + dur + 0.01);
-      }
-
-      function renderChips() {
-        dom.chipCountValue.textContent = state.chips;
-        dom.chipStackContainer.innerHTML = '';
-        for (let i = 0; i < 10; i++) {
-          const dot = document.createElement('div');
-          dot.className = `chip-token w-3.5 h-3.5 rounded-full border ${
-            i < state.chips
-              ? 'bg-[#F3D060] border-[#9E2A2B] shadow-[0_0_6px_rgba(243,208,96,0.75)]'
-              : 'bg-[#2A160B] border-[#D4AF37]/30 opacity-35'
-          }`;
-          dom.chipStackContainer.appendChild(dot);
-        }
-      }
-
-      function showRoundToast(title, sub) {
-        dom.roundResultTitle.textContent = title;
-        dom.roundResultSub.textContent = sub;
-        dom.roundResultToast.classList.remove('opacity-0', 'scale-90');
-        dom.roundResultToast.classList.add('opacity-100', 'scale-100');
-        scheduleTimer(() => {
-          dom.roundResultToast.classList.remove('opacity-100', 'scale-100');
-          dom.roundResultToast.classList.add('opacity-0', 'scale-90');
-        }, 950);
-      }
-
-      function selectFourDistinctWords() {
-        const hand = [];
-        const usedWordKeys = new Set();
-        const usedSynKeys = new Set();
-
-        const candidates = shuffle(state.pool);
-        for (const item of candidates) {
-          const wKey = LexicalVocabRepository.normalizeKey(item.word);
-          if (usedWordKeys.has(wKey)) continue;
-
-          const availSyn = item.synonyms.find(s => !usedSynKeys.has(LexicalVocabRepository.normalizeKey(s)));
-          if (!availSyn) continue;
-
-          usedWordKeys.add(wKey);
-          usedSynKeys.add(LexicalVocabRepository.normalizeKey(availSyn));
-          hand.push({
-            id: item.id,
-            word: item.word,
-            meaning: item.meaning,
-            chosenSynonym: availSyn,
-            forbiddenKeys: item.forbiddenKeys
-          });
-          if (hand.length === 4) break;
-        }
-        return hand;
-      }
-
-      function renderTableHands() {
-        dom.opponentGrid.innerHTML = '';
-        dom.studentGrid.innerHTML = '';
-
-        state.opponentCards.forEach((c, idx) => {
-          const isTarget = idx === state.targetTurnIndex && !c.matched;
-          const slot = document.createElement('div');
-          slot.className = 'card-slot';
-          slot.innerHTML = `
-            <div class="playing-card opponent-card ${c.matched ? 'is-flipped opacity-50' : ''} ${isTarget ? 'active-target' : ''}">
-              <div class="card-face card-front">
-                <div class="card-corner top-left ${c.suit.cls}"><span>${c.rank}</span><span>${c.suit.symbol}</span></div>
-                <div class="corner-ornament tr"></div>
-                <div class="corner-ornament bl"></div>
-                <div class="card-word-text font-card-word text-sm sm:text-base">${escapeHtml(c.word)}</div>
-                <div class="card-vi-text text-[11px] sm:text-xs">(${escapeHtml(c.meaning)})</div>
-                <div class="card-corner bottom-right ${c.suit.cls}"><span>${c.rank}</span><span>${c.suit.symbol}</span></div>
-              </div>
-              <div class="card-face card-back">
-                <span class="font-western text-xs text-[#F3D060]">MATCHED</span>
-              </div>
-            </div>
-          `;
-          dom.opponentGrid.appendChild(slot);
-        });
-
-        state.studentCards.forEach((c, idx) => {
-          const slot = document.createElement('div');
-          slot.className = 'card-slot';
-          slot.innerHTML = `
-            <div class="playing-card student-selectable ${c.matched ? 'is-flipped opacity-45 pointer-events-none' : ''}" data-student-idx="${idx}">
-              <div class="card-face card-front">
-                <div class="card-corner top-left ${c.suit.cls}"><span>${c.rank}</span><span>${c.suit.symbol}</span></div>
-                <div class="corner-ornament tr"></div>
-                <div class="corner-ornament bl"></div>
-                <div class="card-synonym-text text-sm sm:text-base">${escapeHtml(c.synonym)}</div>
-                <div class="card-corner bottom-right ${c.suit.cls}"><span>${c.rank}</span><span>${c.suit.symbol}</span></div>
-              </div>
-              <div class="card-face card-back">
-                <span class="font-western text-xs text-[#F3D060]">USED</span>
-              </div>
-            </div>
-          `;
-          const cardEl = slot.querySelector('.playing-card');
-          cardEl.addEventListener('click', () => handleStudentCardPick(idx, cardEl));
-          dom.studentGrid.appendChild(slot);
-        });
-
-        dom.roundCounterText.textContent = `ROUND ${state.round}`;
-        dom.deckProgressText.textContent = `WORDS ${state.pool.length}`;
-        dom.turnCounterBadge.textContent = `CARD ${Math.min(4, state.targetTurnIndex + 1)} OF 4`;
-        dom.roundMatchTracker.textContent = `${state.matchedCount} / 4 MATCHED`;
-      }
-
-      function dealRound() {
-        if (!state.active) return;
-        const four = selectFourDistinctWords();
-        if (four.length < 4) {
-          showEndScreen(false, 'Not enough distinct vocabulary words & synonyms to deal a 4-card hand.');
-          return;
-        }
-
-        state.targetTurnIndex = 0;
-        state.matchedCount = 0;
-        state.isBusy = false;
-
-        state.opponentCards = four.map((item, i) => ({
-          ...item,
-          rank: RANKS[i % RANKS.length],
-          suit: SUITS[i % SUITS.length],
-          matched: false
-        }));
-
-        state.studentCards = shuffle(
-          four.map((item, i) => ({
-            wordId: item.id,
-            synonym: item.chosenSynonym,
-            synKey: LexicalVocabRepository.normalizeKey(item.chosenSynonym),
-            rank: RANKS[(i + 4) % RANKS.length],
-            suit: SUITS[(i + 1) % SUITS.length],
-            matched: false
-          }))
-        );
-
-        const currentTarget = state.opponentCards[0];
-        dom.cowboySpeech.textContent = `“Match ‘${currentTarget.word}’ if you can!”`;
-        dom.turnStatusSubtext.textContent = 'Tap the matching synonym card below';
-        dom.tableStatusText.textContent = 'SELECT SYNONYM';
-        renderTableHands();
-      }
-
-      function handleStudentCardPick(studentIdx, cardEl) {
-        if (!state.active || state.isBusy) return;
-        const picked = state.studentCards[studentIdx];
-        const target = state.opponentCards[state.targetTurnIndex];
-        if (!picked || picked.matched || !target) return;
-
-        state.isBusy = true;
-        const isCorrect =
-          picked.wordId === target.id ||
-          target.forbiddenKeys.has(picked.synKey);
-
-        if (isCorrect) {
-          playSound(740, 0.1, 'triangle');
-          cardEl.classList.add('correct-flash');
-          state.totalMatches++;
-          state.matchedCount++;
-
-          scheduleTimer(() => {
-            picked.matched = true;
-            target.matched = true;
-            state.targetTurnIndex++;
-
-            if (state.matchedCount >= 4) {
-              state.chips = Math.min(10, state.chips + 1);
-              renderChips();
-              showRoundToast('HAND CLEARED!', '+1 Poker Chip');
-
-              if (state.chips >= 10) {
-                scheduleTimer(() => showEndScreen(true, 'You stacked 10 chips and beat the Outlaw!'), 700);
-                return;
-              }
-              state.round++;
-              scheduleTimer(() => dealRound(), 850);
-            } else {
-              const nextTarget = state.opponentCards[state.targetTurnIndex];
-              dom.cowboySpeech.textContent = `“Nice hit! Now match ‘${nextTarget.word}’.”`;
-              renderTableHands();
-              state.isBusy = false;
-            }
-          }, 320);
-        } else {
-          playSound(170, 0.16, 'sawtooth');
-          state.totalErrors++;
-          state.chips = Math.max(0, state.chips - 2);
-          renderChips();
-          cardEl.classList.add('wrong-flash');
-          dom.gameFrame.classList.add('screen-shake');
-          dom.cowboySpeech.textContent = '“Wrong card, partner! -2 Chips!”';
-
-          scheduleTimer(() => {
-            cardEl.classList.remove('wrong-flash');
-            dom.gameFrame.classList.remove('screen-shake');
-            if (state.chips <= 0) {
-              showEndScreen(false, 'You ran out of chips at the saloon table!');
-            } else {
-              state.isBusy = false;
-            }
-          }, 550);
-        }
-      }
-
-      function showEndScreen(won, message) {
-        state.active = false;
-        state.isBusy = true;
-        dom.endingBadge.textContent = won ? 'SALOON CHAMPION' : 'BUSTED OUT';
-        dom.endingExactMessage.textContent = message;
-        dom.endingStatsSummary.textContent = `Rounds: ${state.round} • Matches: ${state.totalMatches} • Errors: ${state.totalErrors} • Chips: ${state.chips}/10`;
-        dom.endingOverlay.classList.remove('hidden');
-        dom.endingOverlay.classList.add('flex');
-        scheduleTimer(() => {
-          dom.endingCardBox.classList.remove('opacity-0', 'translate-y-4');
-          dom.endingCardBox.classList.add('opacity-100', 'translate-y-0');
-        }, 40);
-      }
-
-      function hideEndScreen() {
-        dom.endingOverlay.classList.add('hidden');
-        dom.endingOverlay.classList.remove('flex');
-        dom.endingCardBox.classList.add('opacity-0', 'translate-y-4');
-        dom.endingCardBox.classList.remove('opacity-100', 'translate-y-0');
-      }
-
-      function startNewGame() {
-        clearTimers();
-        hideEndScreen();
-        state.round = 1;
-        state.chips = 5;
-        state.totalMatches = 0;
-        state.totalErrors = 0;
-        state.active = true;
-        state.isBusy = false;
-        renderChips();
-        dealRound();
-      }
-
-      async function enterFromHub() {
-        clearTimers();
-        hideEndScreen();
-        let pool = LexicalVocabRepository.getNormalizedPlayablePool();
-        if (pool.length < 4) {
-          await LexicalVocabRepository.loadVocabularyForCurrentAccount();
-          pool = LexicalVocabRepository.getNormalizedPlayablePool();
-        }
-        state.pool = pool;
-        if (state.pool.length < 4) {
-          const stats = LexicalVocabRepository.getStats();
-          showEndScreen(false, stats.lastError || 'Need at least 4 playable words with synonyms.');
-          return;
-        }
-        startNewGame();
-      }
-
-      function stopAndCleanup() {
-        state.active = false;
-        state.isBusy = true;
-        clearTimers();
-      }
-
-      function init() {
-        const exit = () => window.HubAPI.switchScreen('hub');
-        dom.pokerBtnBackHub.addEventListener('click', exit);
-        dom.pokerEndingBackHubBtn.addEventListener('click', exit);
-        dom.restartBtn.addEventListener('click', () => {
-          if (state.pool.length >= 4) startNewGame();
-        });
-        dom.playAgainBtn.addEventListener('click', () => {
-          if (state.pool.length >= 4) startNewGame();
-          else exit();
-        });
-        dom.soundToggleBtn.addEventListener('click', () => {
-          state.soundEnabled = !state.soundEnabled;
-          dom.soundOnIcon.classList.toggle('hidden', !state.soundEnabled);
-          dom.soundOffIcon.classList.toggle('hidden', state.soundEnabled);
-        });
-      }
-
-      return { init, enterFromHub, stopAndCleanup };
-    })();
-
-    // Expose APIs & Boot
-    window.QuickDrawnAPI = QuickDrawnGame;
-    window.PokerAPI = WildWestPokerGame;
-
-    window.addEventListener('DOMContentLoaded', () => {
-      QuickDrawnGame.init();
-      WildWestPokerGame.init();
-      HubController.init();
-    });
-  </script>
+    status.textContent = current[1];
+    stage.textContent = current[2];
+
+    if (progress >= 100) {
+      redirected = true;
+      status.textContent = "LEVEL COMPLETE! WELCOME BACK!";
+      window.location.replace(destination);
+      return;
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  requestAnimationFrame(update);
+})();
+</script>
 </body>
 </html>
